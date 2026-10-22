@@ -1,0 +1,16 @@
+{
+  "name": "flix-reversi",
+  "version": "1.0.0",
+  "description": "FLIX REVERSI \u2014 A Premium, Fully Playable Reversi (Othello) Platform with Online Multiplayer, Tactical AI, and Local Pass-and-Play",
+  "private": true,
+  "scripts": {
+    "build": "NODE_PATH=/usr/share/nodejs:/usr/lib/nodejs node scripts/build.cjs",
+    "start": "node dist/server/index.js",
+    "test:unit": "node --test dist/tests/gameEngine.test.js dist/tests/aiEngine.test.js dist/tests/multiplayerAndSystems.test.js dist/tests/serverIntegration.test.js",
+    "test:e2e": "python3 tests/e2e_browser_test.py",
+    "test": "npm run build && npm run test:unit"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
