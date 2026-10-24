@@ -5,29 +5,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: flix-reversi
+    container_name: flix-reversi-app
     restart: unless-stopped
     ports:
       - "${PORT:-8080}:8080"
+    env_file:
+      - .env.example
     environment:
       - NODE_ENV=production
-      - HOST=0.0.0.0
       - PORT=8080
-      - DATA_DIR=/app/data
-      - STATIC_DIR=/app/public
-      - CORS_ORIGIN=${CORS_ORIGIN:-*}
-      - SUPABASE_URL=${SUPABASE_URL:-}
-      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
+      - HOST=0.0.0.0
+      - ROOM_STORE_PATH=/app/data/rooms_snapshot.json
     volumes:
       - flix_reversi_data:/app/data
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8080/healthz', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
-    stop_grace_period: 10s
 
 volumes:
   flix_reversi_data:
-    driver: local

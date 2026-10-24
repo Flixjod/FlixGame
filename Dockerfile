@@ -1,33 +1,31 @@
-# =============================================================================
-# FLIX REVERSI — Production Multi-Stage Dockerfile
-# Compatible with Koyeb, Render, and Ubuntu/Linux VPS
-# =============================================================================
-FROM node:18-alpine AS runner
+# syntax=docker/dockerfile:1
+FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
-# Create non-root application user and durable data directory
-RUN mkdir -p /app/data /app/dist /app/public && chown -R node:node /app
+# Create non-root user for security
+RUN addgroup -S flix && adduser -S flix -G flix
 
-# Copy compiled server, engine modules, and static frontend bundle
-COPY --chown=node:node dist/ ./dist/
-COPY --chown=node:node public/ ./public/
-COPY --chown=node:node package.json ./package.json
+# Copy application source and pre-built frontend bundle
+COPY package.json ./
+COPY src ./src
+COPY server ./server
+COPY supabase ./supabase
+COPY dist ./dist
+
+# Ensure durable data directory is writable by non-root user
+RUN mkdir -p /app/data && chown -R flix:flix /app
+
+USER flix
 
 ENV NODE_ENV=production
-ENV HOST=0.0.0.0
 ENV PORT=8080
-ENV DATA_DIR=/app/data
-ENV STATIC_DIR=/app/public
+ENV HOST=0.0.0.0
+ENV ROOM_STORE_PATH=/app/data/rooms_snapshot.json
 
-VOLUME ["/app/data"]
 EXPOSE 8080
 
-USER node
-
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://127.0.0.1:' + (process.env.PORT || 8080) + '/healthz', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+  CMD wget -qO- http://127.0.0.1:${PORT}/healthz || exit 1
 
-STOPSIGNAL SIGTERM
-
-CMD ["node", "dist/server/index.js"]
+CMD ["node", "server/index.mjs"]
