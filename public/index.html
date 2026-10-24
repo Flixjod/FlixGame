@@ -181,6 +181,7 @@
 
     /* HUD Player Cards */
     .hud-player-card {
+      position: relative;
       background: rgba(9, 11, 14, 0.88);
       border: 2px solid rgba(255, 255, 255, 0.08);
       border-radius: 0.85rem;
@@ -741,42 +742,523 @@
       .lg\:order-1 { order: 1; }
       .lg\:order-2 { order: 2; }
     }
+  
+    /* Dual-Pattern Alternating Checkerboard Squares (4 Luxury Finishes: Emerald, Obsidian, Walnut, Sapphire) */
+    body[data-board-theme="emerald"] {
+      --cell-light-bg: linear-gradient(135deg, rgba(26, 108, 80, 0.94) 0%, rgba(19, 86, 64, 0.96) 100%);
+      --cell-dark-bg: linear-gradient(135deg, rgba(12, 62, 46, 0.97) 0%, rgba(8, 44, 33, 0.99) 100%);
+      --emerald-grid: rgba(212, 175, 55, 0.22);
+    }
+    body[data-board-theme="obsidian"] {
+      --cell-light-bg: linear-gradient(135deg, rgba(38, 47, 61, 0.96) 0%, rgba(29, 36, 48, 0.98) 100%);
+      --cell-dark-bg: linear-gradient(135deg, rgba(18, 23, 31, 0.98) 0%, rgba(11, 15, 21, 1) 100%);
+      --emerald-grid: rgba(212, 175, 55, 0.20);
+    }
+    body[data-board-theme="walnut"] {
+      --cell-light-bg: linear-gradient(135deg, rgba(72, 49, 33, 0.96) 0%, rgba(56, 38, 25, 0.98) 100%);
+      --cell-dark-bg: linear-gradient(135deg, rgba(40, 26, 17, 0.98) 0%, rgba(28, 18, 11, 1) 100%);
+      --emerald-grid: rgba(212, 175, 55, 0.24);
+    }
+    body[data-board-theme="sapphire"] {
+      --cell-light-bg: linear-gradient(135deg, rgba(23, 56, 94, 0.95) 0%, rgba(17, 43, 74, 0.98) 100%);
+      --cell-dark-bg: linear-gradient(135deg, rgba(11, 29, 52, 0.98) 0%, rgba(7, 19, 36, 1) 100%);
+      --emerald-grid: rgba(212, 175, 55, 0.23);
+    }
+
+    button.board-cell.cell-light,
+    .board-cell.cell-light {
+      background: var(--cell-light-bg, linear-gradient(135deg, rgba(26, 108, 80, 0.92) 0%, rgba(19, 86, 64, 0.95) 100%));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    button.board-cell.cell-dark,
+    .board-cell.cell-dark {
+      background: var(--cell-dark-bg, linear-gradient(135deg, rgba(12, 62, 46, 0.96) 0%, rgba(8, 44, 33, 0.98) 100%));
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.28);
+    }
+
+    button.board-cell.is-legal:hover,
+    button.board-cell.is-legal:focus-visible {
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.34) 0%, rgba(26, 108, 80, 0.92) 100%) !important;
+    }
+
+    button.board-cell.capture-preview-target {
+      background: rgba(212, 175, 55, 0.32) !important;
+      box-shadow: inset 0 0 12px rgba(243, 212, 120, 0.45) !important;
+    }
+
+    button.board-cell.last-move-cell {
+      box-shadow: inset 0 0 0 2px rgba(243, 212, 120, 0.55) !important;
+    }
+
+    /* Tactical Coach Best-Move Hint Pulse */
+    @keyframes hintPulseRing {
+      0%, 100% {
+        box-shadow: inset 0 0 0 2.5px #fbbf24, 0 0 14px rgba(251, 191, 36, 0.65);
+      }
+      50% {
+        box-shadow: inset 0 0 0 4px #fef08a, 0 0 22px rgba(251, 191, 36, 0.95);
+      }
+    }
+
+    button.board-cell.hint-best-cell {
+      animation: hintPulseRing 1.1s ease-in-out infinite;
+      z-index: 5;
+    }
+
+    /* Floating Sticker / Quick Message Speech Bubble on Player Cards */
+    @keyframes popReactionBubble {
+      0% {
+        transform: scale(0.5) translateY(6px);
+        opacity: 0;
+      }
+      65% {
+        transform: scale(1.06) translateY(-2px);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .reaction-bubble {
+      position: absolute;
+      right: 10px;
+      top: -16px;
+      z-index: 25;
+      background: linear-gradient(135deg, #161b24 0%, #090b0e 100%);
+      color: #fef3c7;
+      font-weight: 700;
+      font-size: 0.76rem;
+      padding: 5px 11px;
+      border-radius: 9999px;
+      border: 1.5px solid #fbbf24;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.82), 0 0 16px rgba(212, 175, 55, 0.32);
+      pointer-events: none;
+      animation: popReactionBubble 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .reaction-bubble-time {
+      font-size: 0.64rem;
+      font-weight: 600;
+      color: #090b0e;
+      background: linear-gradient(135deg, #fde68a 0%, #d4af37 100%);
+      padding: 1px 6px;
+      border-radius: 9999px;
+    }
+
+    /* Addictive Combo Callout Banner Over Board */
+    @keyframes comboBannerPop {
+      0% {
+        transform: translate(-50%, 10px) scale(0.6);
+        opacity: 0;
+      }
+      20% {
+        transform: translate(-50%, 0) scale(1.06);
+        opacity: 1;
+      }
+      32% {
+        transform: translate(-50%, 0) scale(1);
+        opacity: 1;
+      }
+      82% {
+        transform: translate(-50%, -4px) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -14px) scale(0.92);
+        opacity: 0;
+      }
+    }
+
+    .board-combo-callout {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: linear-gradient(135deg, rgba(18, 22, 28, 0.96) 0%, rgba(9, 11, 14, 0.98) 100%);
+      border: 1.5px solid var(--accent-gold-bright);
+      color: var(--accent-gold-bright);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.75), 0 0 18px rgba(212, 175, 55, 0.35);
+      pointer-events: none;
+      white-space: nowrap;
+      animation: comboBannerPop 1.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    button.sticker-chip {
+      background: linear-gradient(145deg, rgba(24, 30, 40, 0.95) 0%, rgba(12, 15, 20, 0.98) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.26);
+      border-radius: 0.75rem;
+      padding: 0.42rem 0.55rem;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+    }
+
+    button.sticker-chip:hover {
+      transform: translateY(-2px) scale(1.03);
+      border-color: var(--accent-gold-bright);
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.20) 0%, rgba(20, 26, 36, 0.98) 100%);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65), 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+
+    button.qmsg-pill {
+      background: linear-gradient(145deg, rgba(18, 23, 31, 0.94) 0%, rgba(10, 13, 18, 0.98) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 0.65rem;
+      padding: 0.38rem 0.6rem;
+      font-size: 0.72rem;
+      transition: transform 130ms ease, border-color 130ms ease, background 130ms ease;
+    }
+
+    button.qmsg-pill:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-gold-bright);
+      background: rgba(212, 175, 55, 0.14);
+    }
+
+    button.theme-pill-btn {
+      background: rgba(18, 22, 28, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 9999px;
+      padding: 0.24rem 0.68rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      transition: all 140ms ease;
+    }
+
+    button.theme-pill-btn.is-active-theme {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.28) 0%, rgba(212, 175, 55, 0.14) 100%);
+      border-color: #fbbf24;
+      color: #fef3c7;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    }
+
+    button.theme-swatch-card {
+      background: rgba(11, 14, 19, 0.9);
+      border: 1.5px solid rgba(212, 175, 55, 0.2);
+      border-radius: 0.85rem;
+      padding: 0.65rem 0.75rem;
+      text-align: left;
+      transition: all 150ms ease;
+    }
+
+    button.theme-swatch-card:hover {
+      border-color: rgba(243, 212, 120, 0.6);
+      transform: translateY(-1px);
+    }
+
+    button.theme-swatch-card.is-active-theme {
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.18) 0%, rgba(14, 18, 24, 0.96) 100%);
+      border-color: #fbbf24;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.22);
+    }
+
+    .settings-section-card {
+      background: rgba(9, 11, 14, 0.72);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
+    }
+
+    input[type="range"].lux-range {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+    }
+
+    input[type="range"].lux-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #fef3c7 0%, #d4af37 100%);
+      border: 1.5px solid #090b0e;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      cursor: pointer;
+    }
+
+
+    /* Bulletproof Multi-Device Responsive Layouts (320px Mobile, 768px Tablet, 860px Canvas, 1440px Desktop) */
+    .home-hero-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .home-preview-card {
+      width: 100%;
+      max-width: 260px;
+      margin: 0 auto;
+      background: linear-gradient(160deg, rgba(13, 17, 23, 0.96) 0%, rgba(7, 9, 12, 0.99) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 1rem;
+      padding: 0.85rem;
+      box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.85);
+    }
+
+    .home-modes-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.875rem;
+      align-items: stretch;
+    }
+
+    /* 3-Region Game Arena Grid:
+       Mobile/Tablet (<860px):
+         1. .game-status-panel (Top — Player Scores & Turn right above Board)
+         2. .game-board-col    (Middle — 8x8 Board)
+         3. .game-controls-panel (Bottom — Controls, Chat & Move Log)
+       Desktop/Canvas (>=860px):
+         Left Column (340px): .game-status-panel stacked above .game-controls-panel
+         Right Column (1fr):  .game-board-col
+    */
+    .game-arena-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.875rem;
+      align-items: start;
+    }
+
+    .game-status-panel {
+      order: 1;
+    }
+
+    .game-board-col {
+      order: 2;
+    }
+
+    .game-controls-panel {
+      order: 3;
+    }
+
+    /* Side-by-side player cards on mobile/tablet so score bar is compact above the board */
+    .hud-players-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 639px) {
+      .hud-player-card {
+        padding: 0.6rem 0.7rem;
+      }
+      .board-outer-frame {
+        padding: 8px;
+        border-radius: 14px;
+      }
+      .board-coord-layout {
+        grid-template-columns: 16px minmax(0, 1fr);
+        grid-template-rows: 16px minmax(0, 1fr);
+        gap: 2px;
+        max-width: 92vw;
+      }
+    }
+
+    @media (min-width: 700px) {
+      .home-hero-layout {
+        grid-template-columns: minmax(0, 1.4fr) 260px;
+        gap: 2rem;
+      }
+      .home-modes-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+    }
+
+    @media (min-width: 860px) {
+      .game-arena-layout {
+        grid-template-columns: 340px minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        column-gap: 1.5rem;
+        row-gap: 0.875rem;
+      }
+      .game-status-panel {
+        grid-column: 1;
+        grid-row: 1;
+        order: unset;
+      }
+      .game-controls-panel {
+        grid-column: 1;
+        grid-row: 2;
+        order: unset;
+      }
+      .game-board-col {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        order: unset;
+      }
+      .hud-players-grid {
+        grid-template-columns: 1fr;
+        gap: 0.625rem;
+      }
+    }
+
+    /* Utility Completions for Offline / Sandboxed Canvas */
+    .justify-start { justify-content: flex-start; }
+    .min-w-0 { min-width: 0; }
+    .whitespace-nowrap { white-space: nowrap; }
+    .max-w-6xl { max-width: 72rem; }
+    .max-w-\[330px\] { max-width: 330px; }
+    .max-w-\[110px\] { max-width: 110px; }
+    .max-h-24 { max-height: 6rem; }
+    .order-1 { order: 1; }
+    .order-2 { order: 2; }
+    .pt-0\.5 { padding-top: 0.125rem; }
+    .pt-3\.5 { padding-top: 0.875rem; }
+    .pb-1\.5 { padding-bottom: 0.375rem; }
+    .px-0\.5 { padding-left: 0.125rem; padding-right: 0.125rem; }
+    .shadow-lg { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6); }
+    .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .backdrop-blur-sm { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .bg-\[\#090b0e\]\/90 { background-color: rgba(9, 11, 14, 0.92); }
+    .border-amber-400\/30 { border-color: rgba(251, 191, 36, 0.3); }
+    .border-amber-400\/35 { border-color: rgba(251, 191, 36, 0.35); }
+    .border-amber-400\/40 { border-color: rgba(251, 191, 36, 0.4); }
+    .border-amber-400\/45 { border-color: rgba(251, 191, 36, 0.45); }
+    .border-amber-400\/50 { border-color: rgba(251, 191, 36, 0.5); }
+    .border-amber-500\/15 { border-color: rgba(245, 158, 11, 0.16); }
+    .border-amber-500\/20 { border-color: rgba(245, 158, 11, 0.22); }
+    .border-amber-500\/25 { border-color: rgba(245, 158, 11, 0.26); }
+    .border-amber-500\/30 { border-color: rgba(245, 158, 11, 0.32); }
+    @media (min-width: 640px) {
+      .sm\:block { display: block; }
+      .sm\:col-span-2 { grid-column: span 2 / span 2; }
+      .sm\:p-5 { padding: 1.25rem; }
+      .sm\:py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+      .sm\:px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+      .sm\:gap-2 { gap: 0.5rem; }
+      .sm\:gap-2\.5 { gap: 0.625rem; }
+      .sm\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+      .sm\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+      .sm\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
+      .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+      .sm\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    }
+
+    @keyframes pulseRadar {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.18); opacity: 0.45; }
+    }
+    .waiting-pulse-ring {
+      animation: pulseRadar 1.6s ease-in-out infinite;
+    }
+  
+    /* Fix HUD & inline disc sizing so .reversi-disc (82% inside board cells) never collapses in flex rows */
+    .brand-logo .reversi-disc {
+      width: 14px !important;
+      height: 14px !important;
+      flex-shrink: 0 !important;
+    }
+    .preview-card .reversi-disc:not(.board-cell .reversi-disc) {
+      width: 11px !important;
+      height: 11px !important;
+      flex-shrink: 0 !important;
+    }
+    #hud-turn-tag-black, #hud-turn-tag-white {
+      font-size: 0.6rem !important;
+      line-height: 1.1 !important;
+      padding: 2px 5px !important;
+    }
+    .hud-player-card .reversi-disc {
+      width: 30px !important;
+      height: 30px !important;
+      flex-shrink: 0 !important;
+    }
+    @media (max-width: 639px) {
+      .app-header-inner {
+        padding: 0 10px !important;
+        gap: 6px !important;
+      }
+      .brand-wrap {
+        gap: 7px !important;
+      }
+      .brand-logo {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 8px !important;
+      }
+      .brand-title {
+        font-size: 0.85rem !important;
+        letter-spacing: 0.04em !important;
+      }
+      .header-actions {
+        gap: 4px !important;
+      }
+      .header-btn, .header-icon-btn {
+        width: 34px !important;
+        height: 34px !important;
+        padding: 0 !important;
+        justify-content: center !important;
+      }
+      #nav-history-badge {
+        display: none !important;
+      }
+      .hud-player-card {
+        padding: 9px 10px !important;
+      }
+      .hud-player-card .reversi-disc {
+        width: 24px !important;
+        height: 24px !important;
+      }
+    }
+
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
+<body data-board-theme="emerald" class="min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
 
   <!-- Screen Reader Live Region for Accessible Turn, Pass, and Result Announcements -->
   <div id="sr-live-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Top Navigation & Brand Bar -->
   <header class="sticky top-0 z-30 border-b border-amber-500/15 bg-[#090b0e]/90 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2">
-      <!-- Brand Logo -->
-      <button id="btn-nav-brand" type="button" class="nav-brand-btn flex items-center gap-3 rounded-xl py-1.5 px-2.5" aria-label="FLIX REVERSI Home">
-        <div class="relative w-10 h-10 rounded-xl border border-amber-400/40 flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #135c45 0%, #07271d 100%);">
-          <span class="w-4 h-4 rounded-full reversi-disc disc-black" style="margin-right: -3px; margin-top: -3px;"></span>
-          <span class="w-4 h-4 rounded-full reversi-disc disc-white" style="margin-left: -3px; margin-bottom: -3px;"></span>
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+      <!-- Brand Logo (Single-line on all devices) -->
+      <button id="btn-nav-brand" type="button" class="nav-brand-btn flex items-center gap-2.5 rounded-xl py-1 px-2 shrink-0" aria-label="FLIX REVERSI Home">
+        <div class="relative w-9 h-9 rounded-xl border border-amber-400/40 flex items-center justify-center shadow-lg shrink-0" style="background: linear-gradient(135deg, #135c45 0%, #07271d 100%);">
+          <span class="w-3.5 h-3.5 rounded-full reversi-disc disc-black" style="margin-right: -2px; margin-top: -2px;"></span>
+          <span class="w-3.5 h-3.5 rounded-full reversi-disc disc-white" style="margin-left: -2px; margin-bottom: -2px;"></span>
         </div>
-        <div class="text-left">
-          <span class="font-display text-base sm:text-lg font-bold tracking-wider text-amber-100 block" style="line-height: 1.1;">FLIX REVERSI</span>
-          <span class="text-[10px] uppercase tracking-widest text-amber-400 block mt-0.5">Grandmaster Edition</span>
-        </div>
+        <span class="font-display text-sm sm:text-lg font-bold tracking-wider text-amber-100 whitespace-nowrap">FLIX REVERSI</span>
       </button>
 
-      <!-- Right Controls: Tutorial, History, Audio Mute, Settings -->
-      <div class="flex items-center gap-1.5 sm:gap-2.5">
-        <button id="btn-nav-tutorial" type="button" class="btn-secondary px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5" aria-label="How to Play Tutorial">
-          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      <!-- Right Controls: Compact Icons on Mobile, Labels on Desktop -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button id="btn-nav-tutorial" type="button" class="btn-secondary p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5" aria-label="How to Play" title="How to Play">
+          <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
           <span class="hidden sm:inline">How to Play</span>
         </button>
 
-        <button id="btn-nav-history" type="button" class="btn-secondary px-2.5 sm:px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5" aria-label="Match History and Profile">
-          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <button id="btn-nav-profile" type="button" class="btn-secondary p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5" aria-label="Open Player Profile" title="Player Profile">
+          <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span id="nav-profile-name" class="hidden sm:inline text-amber-100 font-semibold truncate max-w-[110px]">Grandmaster</span>
+        </button>
+
+        <button id="btn-nav-history" type="button" class="btn-secondary px-2 py-1.5 sm:px-3 rounded-lg text-xs font-medium flex items-center gap-1" aria-label="Match History" title="Match History">
+          <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span class="hidden md:inline">History</span>
           <span id="nav-history-badge" class="font-mono-num text-[11px] px-1.5 py-0.5 rounded text-amber-300" style="background: rgba(212, 175, 55, 0.18);">0</span>
         </button>
 
-        <button id="btn-nav-mute" type="button" class="btn-secondary p-2 rounded-lg text-amber-300" aria-label="Toggle Master Audio Mute" title="Toggle Sound">
+        <button id="btn-nav-mute" type="button" class="btn-secondary p-2 rounded-lg text-amber-300" aria-label="Toggle Sound" title="Toggle Sound">
           <svg id="icon-sound-on" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
           <svg id="icon-sound-off" class="w-4 h-4 hidden text-rose-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
         </button>
@@ -792,139 +1274,110 @@
   <div id="notification-stack" class="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-4 pointer-events-none flex flex-col gap-2" aria-live="assertive"></div>
 
   <!-- MAIN CONTENT CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-8 flex flex-col justify-center">
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col justify-start">
 
     <!-- ==================== VIEW 1: HOME LANDING SCREEN ==================== -->
-    <section id="view-home" class="space-y-5">
-      <!-- Top Row: Balanced Hero Copy (Left 7 cols) + Live 8x8 Preview Board (Right 5 cols) -->
+    <section id="view-home" class="space-y-4 sm:space-y-5">
+      <!-- Hero Card: Clean Copy + Compact 8x8 Preview Board -->
       <div class="lux-panel rounded-2xl p-5 sm:p-7">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <!-- Left Column: Brand Hero & Primary CTA -->
-          <div class="lg:col-span-7 space-y-5 text-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-amber-300 text-xs font-medium" style="background: rgba(15, 77, 58, 0.35); border-color: rgba(212, 175, 55, 0.32);">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-              <span>Tournament-Grade 8×8 Reversi • Online, AI &amp; Pass-and-Play</span>
-            </div>
+        <div class="home-hero-layout">
 
-            <h1 class="font-display text-3xl sm:text-5xl font-extrabold text-amber-50 leading-tight">
+          <!-- Left Column: Title, Concise Intro & Actions -->
+          <div class="space-y-4 text-left min-w-0">
+            <h1 class="font-display text-2xl sm:text-4xl font-extrabold text-amber-50 leading-tight">
               Every Move <span class="brand-title-gradient">Matters.</span>
             </h1>
 
-            <p class="text-sm sm:text-base text-slate-300 max-w-xl leading-relaxed">
-              Outflank your rival across sixty-four emerald squares. Seize the corners, command mobility, and turn the tide in a single decisive placement—built with deterministic Reversi rules, three alpha-beta AI engines, offline pass-and-play, and real-time private rooms.
+            <p class="text-xs sm:text-base text-slate-300 max-w-xl leading-relaxed">
+              Outflank your opponent across sixty-four squares. Play online in private rooms, challenge the computer across three difficulty levels, or pass and play on a single device.
             </p>
 
-            <!-- Primary & Secondary Hero Actions -->
-            <div class="flex flex-wrap items-center gap-3 pt-1">
-              <button id="btn-hero-play-now" type="button" class="btn-gold px-6 py-3 rounded-xl text-sm sm:text-base flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+              <button id="btn-hero-play-now" type="button" class="btn-gold px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm flex items-center gap-2">
                 <span>Play Now</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
               </button>
-              <button id="btn-hero-how-to-play" type="button" class="btn-secondary px-5 py-3 rounded-xl text-sm sm:text-base font-medium flex items-center gap-2">
-                <span>How to Play</span>
+              <button id="btn-hero-online-quick" type="button" class="btn-secondary px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold text-amber-200">
+                Private Room
               </button>
-            </div>
-
-            <!-- Key Platform Highlights Row -->
-            <div class="grid grid-cols-3 gap-3 pt-3 border-t border-amber-500/15">
-              <div>
-                <div class="font-mono-num text-sm sm:text-base font-bold text-amber-200">8 × 8</div>
-                <div class="text-xs text-slate-400">8-Dir Capture Engine</div>
-              </div>
-              <div>
-                <div class="font-mono-num text-sm sm:text-base font-bold text-amber-200">3 Tiers</div>
-                <div class="text-xs text-slate-400">Easy, Medium &amp; Hard AI</div>
-              </div>
-              <div>
-                <div class="font-mono-num text-sm sm:text-base font-bold text-amber-200">Real-Time</div>
-                <div class="text-xs text-slate-400">Private Room Codes</div>
-              </div>
+              <button id="btn-hero-how-to-play" type="button" class="btn-secondary px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium">
+                How to Play
+              </button>
             </div>
           </div>
 
-          <!-- Right Column: Animated Live 8x8 Preview Board (Independent of Actual Game State) -->
-          <div class="lg:col-span-5 flex flex-col items-center">
-            <div class="w-full max-w-[310px] rounded-2xl p-3.5 border" style="background: rgba(9, 11, 14, 0.72); border-color: rgba(212, 175, 55, 0.25);">
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span class="text-xs uppercase tracking-wider text-amber-200 font-bold">Live Board Preview</span>
-                </div>
-                <span id="preview-step-caption" class="text-[11px] font-mono-num px-2 py-0.5 rounded text-amber-300" style="background: rgba(212, 175, 55, 0.14);">Opening Diagonal</span>
+          <!-- Right Column: Compact Live 8x8 Board Preview -->
+          <div class="flex flex-col items-center justify-center">
+            <div class="home-preview-card space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[11px] uppercase tracking-wider text-amber-200 font-semibold">Board Preview</span>
+                <span id="preview-step-caption" class="text-[10px] font-mono-num px-2 py-0.5 rounded text-amber-300" style="background: rgba(212, 175, 55, 0.14);">Opening</span>
               </div>
 
-              <div class="board-outer-frame p-2.5">
+              <div class="board-outer-frame p-2">
                 <div id="home-preview-board" class="preview-emerald-grid-8" aria-hidden="true"></div>
               </div>
 
-              <div class="mt-3 flex items-center justify-between text-xs text-slate-300 px-1">
-                <span class="flex items-center gap-2">
-                  <span class="w-3.5 h-3.5 rounded-full reversi-disc disc-black inline-block"></span>
-                  <span>Obsidian Black</span>
+              <div class="flex items-center justify-between text-[11px] text-slate-300 px-0.5">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full reversi-disc disc-black inline-block"></span>
+                  <span>Black</span>
                 </span>
-                <span class="text-[11px] font-mono-num text-amber-300" id="preview-score-pill">2 – 2</span>
-                <span class="flex items-center gap-2">
-                  <span class="w-3.5 h-3.5 rounded-full reversi-disc disc-white inline-block"></span>
-                  <span>Warm Ivory</span>
+                <span class="font-mono-num font-semibold text-amber-300" id="preview-score-pill">2 – 2</span>
+                <span class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full reversi-disc disc-white inline-block"></span>
+                  <span>White</span>
                 </span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
-      <!-- Bottom Row: Full-Width 3-Column Mode Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+      <!-- Mode Selection Cards (Clean, Uncluttered, Equal Height) -->
+      <div class="home-modes-grid">
         <!-- Mode 1: Online Multiplayer -->
-        <button id="card-mode-online" type="button" class="lux-card-interactive p-4 rounded-2xl text-left flex flex-col justify-between">
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl border border-amber-400/30 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.45);">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <span class="text-[10px] font-mono-num uppercase tracking-wider px-2.5 py-0.5 rounded-full text-emerald-300 border" style="background: rgba(15, 77, 58, 0.4); border-color: rgba(52, 211, 153, 0.3);">Private Rooms</span>
+        <button id="card-mode-online" type="button" class="lux-card-interactive p-4 sm:p-5 rounded-2xl text-left flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-9 h-9 rounded-xl border border-amber-400/35 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.5);">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <h2 class="font-display text-base font-bold text-amber-100">Online Multiplayer</h2>
-            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">Create private rooms with 6-character codes, share invitation links, synchronize moves in real time, and reconnect seamlessly.</p>
+            <p class="text-xs text-slate-400 leading-relaxed">Create a private 6-character room code to invite a friend, or join an existing room.</p>
           </div>
-          <div class="pt-4 mt-4 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
-            <span>Enter Online Lobby</span>
+          <div class="pt-3 mt-3 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
+            <span>Open Online Lobby</span>
             <span>→</span>
           </div>
         </button>
 
-        <!-- Mode 2: Play vs AI -->
-        <button id="card-mode-ai" type="button" class="lux-card-interactive p-4 rounded-2xl text-left flex flex-col justify-between">
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl border border-amber-400/30 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.45);">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              </div>
-              <span class="text-[10px] font-mono-num uppercase tracking-wider px-2.5 py-0.5 rounded-full text-amber-300 border" style="background: rgba(212, 175, 55, 0.14); border-color: rgba(212, 175, 55, 0.3);">Easy • Med • Hard</span>
+        <!-- Mode 2: Play vs Computer -->
+        <button id="card-mode-ai" type="button" class="lux-card-interactive p-4 sm:p-5 rounded-2xl text-left flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-9 h-9 rounded-xl border border-amber-400/35 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.5);">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
-            <h2 class="font-display text-base font-bold text-amber-100">Play vs AI</h2>
-            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">Test your strategy against three distinct computer opponents featuring alpha-beta pruning, mobility evaluation, and corner stability.</p>
+            <h2 class="font-display text-base font-bold text-amber-100">Play vs Computer</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">Play solo against Easy, Medium, or Hard computer opponents at your own pace.</p>
           </div>
-          <div class="pt-4 mt-4 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
-            <span>Configure AI Match</span>
+          <div class="pt-3 mt-3 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
+            <span>Setup Solo Game</span>
             <span>→</span>
           </div>
         </button>
 
-        <!-- Mode 3: Local Multiplayer -->
-        <button id="card-mode-local" type="button" class="lux-card-interactive p-4 rounded-2xl text-left flex flex-col justify-between">
-          <div class="space-y-2.5">
-            <div class="flex items-center justify-between">
-              <div class="w-10 h-10 rounded-xl border border-amber-400/30 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.45);">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              </div>
-              <span class="text-[10px] font-mono-num uppercase tracking-wider px-2.5 py-0.5 rounded-full text-slate-300 border" style="background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.16);">100% Offline</span>
+        <!-- Mode 3: Pass & Play -->
+        <button id="card-mode-local" type="button" class="lux-card-interactive p-4 sm:p-5 rounded-2xl text-left flex flex-col justify-between">
+          <div class="space-y-2">
+            <div class="w-9 h-9 rounded-xl border border-amber-400/35 flex items-center justify-center text-amber-300" style="background: rgba(15, 77, 58, 0.5);">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
-            <h2 class="font-display text-base font-bold text-amber-100">Local Multiplayer</h2>
-            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">Pass-and-play against a friend on the same device with custom player names, optional turn timers, and full move review.</p>
+            <h2 class="font-display text-base font-bold text-amber-100">Pass &amp; Play</h2>
+            <p class="text-xs text-slate-400 leading-relaxed">Play against another person on the same device without an internet connection.</p>
           </div>
-          <div class="pt-4 mt-4 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
-            <span>Start Pass-and-Play</span>
+          <div class="pt-3 mt-3 border-t border-amber-500/15 flex items-center justify-between text-xs font-bold text-amber-400">
+            <span>Start 2-Player Game</span>
             <span>→</span>
           </div>
         </button>
@@ -932,64 +1385,64 @@
     </section>
 
     <!-- ==================== VIEW 2: MODE SETUP & ONLINE LOBBY ==================== -->
-    <section id="view-setup" class="hidden max-w-2xl w-full mx-auto">
-      <div class="lux-panel rounded-2xl p-5 sm:p-7 space-y-6">
-        <div class="flex items-center justify-between border-b border-amber-500/15 pb-4">
+    <section id="view-setup" class="hidden max-w-xl w-full mx-auto">
+      <div class="lux-panel rounded-2xl p-5 sm:p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-amber-500/15 pb-3.5">
           <div>
-            <span id="setup-mode-pill" class="text-[11px] uppercase tracking-widest text-amber-400 font-semibold">Game Setup</span>
-            <h2 id="setup-mode-title" class="font-display text-xl sm:text-2xl font-bold text-amber-50 mt-0.5">Configure Match</h2>
+            <span id="setup-mode-pill" class="text-[10px] uppercase tracking-widest text-amber-400 font-semibold">Match Setup</span>
+            <h2 id="setup-mode-title" class="font-display text-lg sm:text-xl font-bold text-amber-50 mt-0.5">Play vs Computer</h2>
           </div>
-          <button id="btn-setup-back" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium">← Back to Home</button>
+          <button id="btn-setup-back" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-medium">← Home</button>
         </div>
 
-        <!-- Mode Selector Tabs inside Setup -->
-        <div class="grid grid-cols-3 gap-2 bg-[#090b0e] p-1.5 rounded-xl border border-amber-500/15" role="tablist">
-          <button id="tab-setup-ai" type="button" role="tab" class="py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-colors">vs AI</button>
-          <button id="tab-setup-local" type="button" role="tab" class="py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-colors">Local 2P</button>
-          <button id="tab-setup-online" type="button" role="tab" class="py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-colors">Online Room</button>
+        <!-- Mode Selector Tabs -->
+        <div class="grid grid-cols-3 gap-1.5 bg-[#090b0e] p-1.5 rounded-xl border border-amber-500/15" role="tablist">
+          <button id="tab-setup-ai" type="button" role="tab" class="py-2 px-2.5 rounded-lg text-xs font-semibold">vs Computer</button>
+          <button id="tab-setup-local" type="button" role="tab" class="py-2 px-2.5 rounded-lg text-xs font-semibold">Pass &amp; Play</button>
+          <button id="tab-setup-online" type="button" role="tab" class="py-2 px-2.5 rounded-lg text-xs font-semibold">Online Room</button>
         </div>
 
         <!-- SUB-PANEL A: VS AI CONFIGURATION -->
-        <div id="setup-panel-ai" class="space-y-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div id="setup-panel-ai" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label for="input-ai-player-name" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Your Name</label>
-              <input id="input-ai-player-name" type="text" maxlength="20" value="Grandmaster" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
+              <label for="input-ai-player-name" class="block text-xs font-semibold text-slate-300 mb-1">Your Name</label>
+              <input id="input-ai-player-name" type="text" maxlength="20" value="Grandmaster" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
             </div>
             <div>
-              <label for="select-ai-timer" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Turn Timer (Optional)</label>
-              <select id="select-ai-timer" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50">
-                <option value="0">Untimed (Standard)</option>
-                <option value="15">15 Seconds / Turn (Blitz)</option>
-                <option value="30">30 Seconds / Turn (Rapid)</option>
-                <option value="60">60 Seconds / Turn (Classical)</option>
+              <label for="select-ai-timer" class="block text-xs font-semibold text-slate-300 mb-1">Turn Timer</label>
+              <select id="select-ai-timer" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50">
+                <option value="0">No Timer</option>
+                <option value="15">15s per Turn</option>
+                <option value="30">30s per Turn</option>
+                <option value="60">60s per Turn</option>
               </select>
             </div>
           </div>
 
           <!-- Disc Color Selection -->
           <div>
-            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Select Your Disc Color</span>
-            <div class="grid grid-cols-3 gap-2.5">
-              <button id="btn-ai-color-b" type="button" data-ai-color="B" class="ai-color-btn p-3 rounded-xl border text-left flex items-center gap-2.5">
-                <span class="w-5 h-5 rounded-full reversi-disc disc-black shrink-0"></span>
+            <span class="block text-xs font-semibold text-slate-300 mb-1.5">Your Disc Color</span>
+            <div class="grid grid-cols-3 gap-2">
+              <button id="btn-ai-color-b" type="button" data-ai-color="B" class="ai-color-btn p-2.5 rounded-xl border text-left flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full reversi-disc disc-black shrink-0"></span>
                 <div>
                   <div class="text-xs font-bold text-amber-50">Black</div>
-                  <div class="text-[10px] text-slate-400">Moves 1st</div>
+                  <div class="text-[10px] text-slate-400">1st Move</div>
                 </div>
               </button>
-              <button id="btn-ai-color-w" type="button" data-ai-color="W" class="ai-color-btn p-3 rounded-xl border text-left flex items-center gap-2.5">
-                <span class="w-5 h-5 rounded-full reversi-disc disc-white shrink-0"></span>
+              <button id="btn-ai-color-w" type="button" data-ai-color="W" class="ai-color-btn p-2.5 rounded-xl border text-left flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full reversi-disc disc-white shrink-0"></span>
                 <div>
                   <div class="text-xs font-bold text-amber-50">White</div>
-                  <div class="text-[10px] text-slate-400">Moves 2nd</div>
+                  <div class="text-[10px] text-slate-400">2nd Move</div>
                 </div>
               </button>
-              <button id="btn-ai-color-r" type="button" data-ai-color="random" class="ai-color-btn p-3 rounded-xl border text-left flex items-center gap-2.5">
-                <span class="w-5 h-5 rounded-full shrink-0" style="background: linear-gradient(90deg, #090b0e 50%, #f7f3e8 50%); border: 1px solid rgba(212,175,55,0.5);"></span>
+              <button id="btn-ai-color-r" type="button" data-ai-color="random" class="ai-color-btn p-2.5 rounded-xl border text-left flex items-center gap-2">
+                <span class="w-4 h-4 rounded-full shrink-0" style="background: linear-gradient(90deg, #090b0e 50%, #f7f3e8 50%); border: 1px solid rgba(212,175,55,0.5);"></span>
                 <div>
                   <div class="text-xs font-bold text-amber-50">Random</div>
-                  <div class="text-[10px] text-slate-400">Coin Toss</div>
+                  <div class="text-[10px] text-slate-400">Auto</div>
                 </div>
               </button>
             </div>
@@ -997,56 +1450,47 @@
 
           <!-- AI Difficulty Selection -->
           <div>
-            <span class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">AI Opponent Strength</span>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <button id="btn-ai-diff-easy" type="button" data-ai-diff="easy" class="ai-diff-btn p-3.5 rounded-xl border text-left">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-emerald-300">Easy</span>
-                  <span class="text-[10px] font-mono-num text-slate-400">Depth 1</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Opportunistic captures with basic positional instincts.</p>
+            <span class="block text-xs font-semibold text-slate-300 mb-1.5">Difficulty</span>
+            <div class="grid grid-cols-3 gap-2">
+              <button id="btn-ai-diff-easy" type="button" data-ai-diff="easy" class="ai-diff-btn p-3 rounded-xl border text-left">
+                <div class="text-xs font-bold text-emerald-300">Easy</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Casual pace</p>
               </button>
-              <button id="btn-ai-diff-medium" type="button" data-ai-diff="medium" class="ai-diff-btn p-3.5 rounded-xl border text-left">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-amber-300">Medium</span>
-                  <span class="text-[10px] font-mono-num text-slate-400">Depth 3 α-β</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Positional matrix, corner priority, and mobility search.</p>
+              <button id="btn-ai-diff-medium" type="button" data-ai-diff="medium" class="ai-diff-btn p-3 rounded-xl border text-left">
+                <div class="text-xs font-bold text-amber-300">Medium</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Balanced play</p>
               </button>
-              <button id="btn-ai-diff-hard" type="button" data-ai-diff="hard" class="ai-diff-btn p-3.5 rounded-xl border text-left">
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-bold text-rose-300">Hard</span>
-                  <span class="text-[10px] font-mono-num text-slate-400">Depth 5–9 α-β</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-1">Move ordering, frontier penalties, edge stability &amp; endgame solver.</p>
+              <button id="btn-ai-diff-hard" type="button" data-ai-diff="hard" class="ai-diff-btn p-3 rounded-xl border text-left">
+                <div class="text-xs font-bold text-rose-300">Hard</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Strong tactics</p>
               </button>
             </div>
           </div>
 
-          <button id="btn-start-ai-match" type="button" class="btn-gold w-full py-3.5 rounded-xl text-sm sm:text-base">Launch AI Match</button>
+          <button id="btn-start-ai-match" type="button" class="btn-gold w-full py-3 rounded-xl text-sm font-bold">Start Match</button>
         </div>
 
         <!-- SUB-PANEL B: LOCAL PASS-AND-PLAY CONFIGURATION -->
-        <div id="setup-panel-local" class="hidden space-y-5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div id="setup-panel-local" class="hidden space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label for="input-local-black" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Black Discs Player (Moves 1st)</label>
-              <input id="input-local-black" type="text" maxlength="20" value="Player 1 (Black)" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
+              <label for="input-local-black" class="block text-xs font-semibold text-slate-300 mb-1">Black Player (Moves 1st)</label>
+              <input id="input-local-black" type="text" maxlength="20" value="Player 1 (Black)" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
             </div>
             <div>
-              <label for="input-local-white" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">White Discs Player (Moves 2nd)</label>
-              <input id="input-local-white" type="text" maxlength="20" value="Player 2 (White)" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
+              <label for="input-local-white" class="block text-xs font-semibold text-slate-300 mb-1">White Player (Moves 2nd)</label>
+              <input id="input-local-white" type="text" maxlength="20" value="Player 2 (White)" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
             </div>
           </div>
 
           <div class="flex items-center justify-between gap-3">
-            <button id="btn-local-swap-colors" type="button" class="btn-secondary px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
-              <span>⇄ Swap Disc Colors</span>
+            <button id="btn-local-swap-colors" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-semibold">
+              ⇄ Swap Players
             </button>
             <div class="flex items-center gap-2">
-              <label for="select-local-timer" class="text-xs text-slate-300 font-medium">Turn Timer:</label>
+              <label for="select-local-timer" class="text-xs text-slate-300 font-medium">Timer:</label>
               <select id="select-local-timer" class="px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-xs text-amber-50">
-                <option value="0">Untimed</option>
+                <option value="0">No Timer</option>
                 <option value="15">15s / Turn</option>
                 <option value="30">30s / Turn</option>
                 <option value="60">60s / Turn</option>
@@ -1054,108 +1498,94 @@
             </div>
           </div>
 
-          <button id="btn-start-local-match" type="button" class="btn-gold w-full py-3.5 rounded-xl text-sm sm:text-base">Start Local Pass-and-Play Match</button>
+          <button id="btn-start-local-match" type="button" class="btn-gold w-full py-3 rounded-xl text-sm font-bold">Start 2-Player Match</button>
         </div>
 
         <!-- SUB-PANEL C: ONLINE MULTIPLAYER ROOM CREATION & JOINING -->
-        <div id="setup-panel-online" class="hidden space-y-5">
-          <!-- Transport Status Disclosure Banner -->
-          <div class="p-3.5 rounded-xl bg-[#090b0e] border border-amber-500/25 flex items-start justify-between gap-3">
-            <div class="space-y-0.5">
-              <div class="flex items-center gap-2">
-                <span id="online-transport-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span id="online-transport-label" class="text-xs font-bold text-amber-100">Authoritative Room Synchronizer Active</span>
-              </div>
-              <p id="online-transport-desc" class="text-[11px] text-slate-400 leading-relaxed">
-                Synchronizes private rooms across independent browser tabs/windows via BroadcastChannel + storage ledger, and connects automatically to the Node/WebSocket or Supabase Realtime backend when configured.
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div id="setup-panel-online" class="hidden space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label for="input-online-nickname" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Your Online Nickname</label>
-              <input id="input-online-nickname" type="text" maxlength="20" value="HostPlayer" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
+              <label for="input-online-nickname" class="block text-xs font-semibold text-slate-300 mb-1">Your Nickname</label>
+              <input id="input-online-nickname" type="text" maxlength="20" value="HostPlayer" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50" />
             </div>
             <div>
-              <label for="select-online-color" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">Host Disc Preference</label>
-              <select id="select-online-color" class="w-full px-3.5 py-2.5 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50">
-                <option value="B">Black (Moves First)</option>
-                <option value="W">White (Moves Second)</option>
-                <option value="random">Random Assignment</option>
+              <label for="select-online-color" class="block text-xs font-semibold text-slate-300 mb-1">Host Disc Color</label>
+              <select id="select-online-color" class="w-full px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/25 text-sm text-amber-50">
+                <option value="B">Black (Moves 1st)</option>
+                <option value="W">White (Moves 2nd)</option>
+                <option value="random">Random</option>
               </select>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <!-- Create Private Room Card -->
             <div class="p-4 rounded-xl bg-[#090b0e] border border-amber-500/20 flex flex-col justify-between space-y-3">
               <div>
-                <h3 class="font-display text-sm font-bold text-amber-100">Create Private Room</h3>
-                <p class="text-xs text-slate-400 mt-1">Generate a unique 6-character room code and shareable invitation link.</p>
-                <div class="mt-2.5">
-                  <label for="select-online-timer" class="block text-[11px] text-slate-400 mb-1">Optional Turn Timer</label>
+                <h3 class="font-display text-sm font-bold text-amber-100">Create Room</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Generate a 6-character code to invite a friend.</p>
+                <div class="mt-2">
+                  <label for="select-online-timer" class="block text-[11px] text-slate-400 mb-1">Turn Timer</label>
                   <select id="select-online-timer" class="w-full px-2.5 py-1.5 rounded-lg bg-[#12161c] border border-amber-500/20 text-xs text-amber-50">
-                    <option value="0">No Turn Timer</option>
-                    <option value="30">30 Seconds / Turn</option>
-                    <option value="60">60 Seconds / Turn</option>
+                    <option value="0">No Timer</option>
+                    <option value="30">30s / Turn</option>
+                    <option value="60">60s / Turn</option>
                   </select>
                 </div>
               </div>
-              <button id="btn-online-create-room" type="button" class="btn-gold w-full py-2.5 rounded-xl text-xs sm:text-sm">Create Private Room</button>
+              <button id="btn-online-create-room" type="button" class="btn-gold w-full py-2.5 rounded-xl text-xs font-bold">Create Private Room</button>
             </div>
 
             <!-- Join Existing Room Card -->
             <div class="p-4 rounded-xl bg-[#090b0e] border border-amber-500/20 flex flex-col justify-between space-y-3">
               <div>
-                <h3 class="font-display text-sm font-bold text-amber-100">Join by Room Code</h3>
-                <p class="text-xs text-slate-400 mt-1">Enter a 6-character room code or paste an invitation code.</p>
-                <input id="input-online-join-code" type="text" maxlength="12" placeholder="e.g. K7M9P2" class="mt-2.5 w-full px-3 py-2 rounded-lg bg-[#12161c] border border-amber-500/30 font-mono-num uppercase text-sm tracking-widest text-amber-200" />
+                <h3 class="font-display text-sm font-bold text-amber-100">Join Room</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Enter a friend's 6-character room code.</p>
+                <input id="input-online-join-code" type="text" maxlength="12" placeholder="CODE (e.g. K7M9P2)" class="mt-2.5 w-full px-3 py-2 rounded-lg bg-[#12161c] border border-amber-500/30 font-mono-num uppercase text-sm tracking-widest text-amber-200" />
               </div>
-              <button id="btn-online-join-room" type="button" class="btn-secondary w-full py-2.5 rounded-xl text-xs sm:text-sm font-semibold">Join Existing Room</button>
+              <button id="btn-online-join-room" type="button" class="btn-secondary w-full py-2.5 rounded-xl text-xs font-semibold">Join Room</button>
             </div>
           </div>
 
           <!-- Waiting Lobby Box (Shown when room is created and awaiting second player) -->
-          <div id="online-waiting-lobby" class="hidden p-4 sm:p-5 rounded-xl border space-y-4" style="background: rgba(15, 77, 58, 0.25); border-color: rgba(212, 175, 55, 0.4);">
+          <div id="online-waiting-lobby" class="hidden p-4 rounded-xl border space-y-3" style="background: rgba(15, 77, 58, 0.25); border-color: rgba(212, 175, 55, 0.4);">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span class="text-[10px] uppercase tracking-widest text-amber-300 font-semibold block">Private Waiting Lobby</span>
-                <div class="flex items-center gap-2 mt-0.5">
-                  <span class="text-xs text-slate-300">Room Code:</span>
-                  <span id="lobby-room-code" class="font-mono-num text-lg font-extrabold tracking-widest text-amber-300 bg-[#090b0e] px-2.5 py-0.5 rounded border border-amber-400/30">------</span>
-                </div>
-              </div>
               <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                <span id="lobby-presence-status" class="text-xs font-medium text-amber-200">Waiting for opponent (1/2 confirmed)...</span>
+                <span class="text-xs text-slate-300">Room Code:</span>
+                <span id="lobby-room-code" class="font-mono-num text-base font-extrabold tracking-widest text-amber-300 bg-[#090b0e] px-2.5 py-0.5 rounded border border-amber-400/30">------</span>
               </div>
+              <span id="lobby-presence-status" class="text-xs font-medium text-amber-200">Waiting for opponent (1/2)…</span>
             </div>
 
-            <div class="text-xs text-slate-300 bg-[#090b0e] p-2.5 rounded-lg border border-amber-500/20 flex items-center justify-between gap-2">
+            <div class="text-xs text-slate-300 bg-[#090b0e] p-2 rounded-lg border border-amber-500/20 flex items-center justify-between gap-2">
               <span id="lobby-invite-url" class="font-mono-num text-[11px] text-slate-400 truncate">https://flix-reversi.app/#room=------</span>
               <div class="flex items-center gap-1.5 shrink-0">
-                <button id="btn-lobby-copy-code" type="button" class="btn-secondary px-2.5 py-1 rounded text-[11px] font-semibold">Copy Code</button>
-                <button id="btn-lobby-copy-link" type="button" class="btn-secondary px-2.5 py-1 rounded text-[11px] font-semibold">Copy Link</button>
-                <button id="btn-lobby-share" type="button" class="btn-secondary px-2.5 py-1 rounded text-[11px] font-semibold">Share</button>
+                <button id="btn-lobby-copy-code" type="button" class="btn-secondary px-2 py-1 rounded text-[11px] font-semibold">Copy Code</button>
+                <button id="btn-lobby-copy-link" type="button" class="btn-secondary px-2 py-1 rounded text-[11px] font-semibold">Copy Link</button>
+                <button id="btn-lobby-share" type="button" class="btn-secondary px-2 py-1 rounded text-[11px] font-semibold">Share</button>
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-              <button id="btn-lobby-connect-second-client" type="button" class="btn-gold px-3.5 py-2 rounded-lg text-xs font-bold" title="Connects a real second MultiplayerClientSession instance to this room so you can play & verify both seats immediately">
-                + Connect Second Client Seat (Live Dual-Session)
-              </button>
-              <button id="btn-lobby-leave" type="button" class="btn-secondary px-3 py-2 rounded-lg text-xs text-rose-300">Leave Lobby</button>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button id="btn-lobby-wait-in-room" type="button" class="btn-gold px-3.5 py-1.5 rounded-lg text-xs font-bold">
+                  Wait in Room →
+                </button>
+                <button id="btn-lobby-connect-second-client" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-200">
+                  + Join 2nd Seat
+                </button>
+              </div>
+              <button id="btn-lobby-leave" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs text-rose-300">Cancel Room</button>
             </div>
           </div>
 
           <!-- Room Error / Recovery Box -->
-          <div id="online-error-recovery" class="hidden p-4 rounded-xl border space-y-2.5" style="background: rgba(136, 19, 55, 0.35); border-color: rgba(251, 113, 133, 0.4);">
+          <div id="online-error-recovery" class="hidden p-3.5 rounded-xl border space-y-2" style="background: rgba(136, 19, 55, 0.35); border-color: rgba(251, 113, 133, 0.4);">
             <div class="text-xs font-bold text-rose-300" id="online-error-title">Room Unavailable</div>
             <p class="text-xs text-slate-300" id="online-error-message">The requested room code could not be joined.</p>
             <div class="flex items-center gap-2 pt-1">
-              <button id="btn-recovery-create-new" type="button" class="btn-gold px-3 py-1.5 rounded-lg text-xs">Create Fresh Room</button>
-              <button id="btn-recovery-clear" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs">Try Different Code</button>
+              <button id="btn-recovery-create-new" type="button" class="btn-gold px-3 py-1.5 rounded-lg text-xs">Create New Room</button>
+              <button id="btn-recovery-clear" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs">Try Another Code</button>
             </div>
           </div>
         </div>
@@ -1164,130 +1594,115 @@
 
     <!-- ==================== VIEW 3: ACTIVE GAMEPLAY ARENA ==================== -->
     <section id="view-game" class="hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="game-arena-layout">
 
-        <!-- Left HUD Column: Players, Scores, Connection Status, & Match Controls -->
-        <div class="lg:col-span-4 space-y-4 order-2 lg:order-1">
-          <!-- Mode & Connection Status Header Card -->
-          <div class="lux-panel p-4 rounded-2xl space-y-3">
-            <div class="flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <span id="hud-mode-badge" class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-amber-300 border" style="background: rgba(212, 175, 55, 0.16); border-color: rgba(212, 175, 55, 0.32);">VS AI • MEDIUM</span>
-                <span id="hud-room-code-pill" class="hidden font-mono-num text-[11px] px-2 py-0.5 rounded text-emerald-300 border" style="background: rgba(15, 77, 58, 0.5); border-color: rgba(52, 211, 153, 0.3);">ROOM: ------</span>
-              </div>
-              <div id="hud-timer-pill" class="hidden font-mono-num text-xs font-bold px-2.5 py-0.5 rounded bg-[#090b0e] text-amber-300 border border-amber-500/30">00:30</div>
+        <!-- REGION 1: PLAYER SCORE CARDS & STATUS (Top on Mobile/Tablet, Top-Left on Desktop) -->
+        <div class="game-status-panel lux-panel p-3.5 sm:p-4 rounded-2xl space-y-2.5 min-w-0">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span id="hud-mode-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-amber-300 border truncate" style="background: rgba(212, 175, 55, 0.14); border-color: rgba(212, 175, 55, 0.3);">VS AI</span>
+              <span id="hud-room-code-pill" class="hidden font-mono-num text-[10px] px-2 py-0.5 rounded text-emerald-300 border shrink-0" style="background: rgba(15, 77, 58, 0.5); border-color: rgba(52, 211, 153, 0.3);">ROOM: ------</span>
             </div>
+            <div id="hud-timer-pill" class="hidden font-mono-num text-xs font-bold px-2 py-0.5 rounded bg-[#090b0e] text-amber-300 border border-amber-500/30 shrink-0">00:30</div>
+          </div>
 
-            <!-- Online Connection Status Bar (Shown in Online Mode) -->
-            <div id="hud-connection-bar" class="hidden px-3 py-2 rounded-xl bg-[#090b0e] border border-amber-500/20 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <span id="hud-conn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-                <span id="hud-conn-text" class="text-xs font-semibold text-amber-100">Connected</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <button id="btn-hud-sim-drop" type="button" class="btn-secondary text-[10px] px-2 py-0.5 rounded" title="Test disconnection & bounded exponential backoff recovery">Test Drop/Recover</button>
-                <button id="btn-hud-reconnect" type="button" class="hidden btn-gold text-[10px] px-2 py-0.5 rounded font-bold">Reconnect</button>
-              </div>
+          <!-- Online Connection Status Bar (Shown only in Online Mode) -->
+          <div id="hud-connection-bar" class="hidden px-3 py-1.5 rounded-xl bg-[#090b0e] border border-amber-500/20 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <span id="hud-conn-dot" class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+              <span id="hud-conn-text" class="text-xs font-semibold text-amber-100 truncate">Connected</span>
             </div>
-
-            <!-- Player 1 (Black Discs) Panel -->
-            <div id="hud-card-black" class="hud-player-card is-active-turn flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full reversi-disc disc-black shrink-0"></div>
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <span id="hud-name-black" class="text-sm font-bold text-amber-50">Black</span>
-                    <span id="hud-turn-tag-black" class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-black">Active Turn</span>
-                  </div>
-                  <div id="hud-sub-black" class="text-[11px] text-slate-400">Moves First • 0 Skipped</div>
-                </div>
-              </div>
-              <div id="hud-score-black" class="font-mono-num text-2xl font-extrabold text-amber-100">2</div>
-            </div>
-
-            <!-- Player 2 (White Discs) Panel -->
-            <div id="hud-card-white" class="hud-player-card is-inactive-turn flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full reversi-disc disc-white shrink-0"></div>
-                <div>
-                  <div class="flex items-center gap-1.5">
-                    <span id="hud-name-white" class="text-sm font-bold text-amber-50">White</span>
-                    <span id="hud-turn-tag-white" class="hidden text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-black">Active Turn</span>
-                  </div>
-                  <div id="hud-sub-white" class="text-[11px] text-slate-400">Moves Second • 0 Skipped</div>
-                </div>
-              </div>
-              <div id="hud-score-white" class="font-mono-num text-2xl font-extrabold text-amber-100">2</div>
-            </div>
-
-            <!-- Territory Balance Bar -->
-            <div class="space-y-1.5 pt-1">
-              <div class="flex justify-between text-[11px] text-slate-400 font-mono-num">
-                <span id="hud-legal-count">4 Legal Moves (Black)</span>
-                <span id="hud-empty-count">60 Empty Squares</span>
-              </div>
-              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex border">
-                <div id="hud-bar-black" class="bg-slate-950 h-full" style="width: 50%; transition: width 260ms ease;"></div>
-                <div id="hud-bar-white" class="bg-[#f5f2eb] h-full" style="width: 50%; transition: width 260ms ease;"></div>
-              </div>
-            </div>
-
-            <!-- Subtle AI "Thinking..." Indicator -->
-            <div id="hud-ai-thinking" class="hidden px-3 py-2 rounded-xl border flex items-center justify-center gap-2 text-xs text-amber-300 font-medium" style="background: rgba(212, 175, 55, 0.12); border-color: rgba(212, 175, 55, 0.3);">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-              <span id="hud-ai-thinking-text">Thinking… Evaluating tactical lines</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btn-hud-sim-drop" type="button" class="btn-secondary text-[10px] px-2 py-0.5 rounded whitespace-nowrap">↻ Sync</button>
+              <button id="btn-hud-reconnect" type="button" class="hidden btn-gold text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap">Reconnect</button>
             </div>
           </div>
 
-          <!-- Match Action Controls & Move History Log -->
-          <div class="lux-panel p-4 rounded-2xl space-y-3">
-            <div class="grid grid-cols-2 gap-2">
-              <button id="btn-game-restart" type="button" class="btn-secondary py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
-                <span>↻ Restart Match</span>
-              </button>
-              <button id="btn-game-leave" type="button" class="btn-secondary py-2 px-3 rounded-xl text-xs font-semibold text-rose-300 flex items-center justify-center gap-1.5">
-                <span>← Leave Match</span>
-              </button>
+          <!-- Players Grid: Side-by-Side on Mobile/Tablet, Stacked on Desktop -->
+          <div class="hud-players-grid">
+            <!-- Player 1 (Black Discs) -->
+            <div id="hud-card-black" class="hud-player-card is-active-turn relative flex items-center justify-between gap-2 min-w-0">
+              <div id="hud-reaction-black" class="hidden reaction-bubble"></div>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full reversi-disc disc-black shrink-0"></div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span id="hud-name-black" class="text-xs sm:text-sm font-bold text-amber-50 truncate">Black</span>
+                    <span id="hud-turn-tag-black" class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-black shrink-0">Turn</span>
+                  </div>
+                  <div id="hud-sub-black" class="text-[10px] text-slate-400 truncate">Black • 0 Skipped</div>
+                </div>
+              </div>
+              <div id="hud-score-black" class="font-mono-num text-xl sm:text-2xl font-extrabold text-amber-100 shrink-0">2</div>
             </div>
 
-            <!-- Review Mode Scrubber Bar (Visible when reviewing a completed match) -->
-            <div id="review-scrubber-panel" class="hidden p-3 rounded-xl border space-y-2" style="background: rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.35);">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Read-Only Match Review</span>
-                <span id="review-step-label" class="font-mono-num text-xs text-amber-100">Final Board</span>
+            <!-- Player 2 (White Discs) -->
+            <div id="hud-card-white" class="hud-player-card is-inactive-turn relative flex items-center justify-between gap-2 min-w-0">
+              <div id="hud-reaction-white" class="hidden reaction-bubble"></div>
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full reversi-disc disc-white shrink-0"></div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span id="hud-name-white" class="text-xs sm:text-sm font-bold text-amber-50 truncate">White</span>
+                    <span id="hud-turn-tag-white" class="hidden text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-amber-400 text-black shrink-0">Turn</span>
+                  </div>
+                  <div id="hud-sub-white" class="text-[10px] text-slate-400 truncate">White • 0 Skipped</div>
+                </div>
               </div>
-              <div class="grid grid-cols-5 gap-1.5">
-                <button id="btn-review-first" type="button" class="btn-secondary py-1.5 rounded text-xs font-mono-num" aria-label="First Move">|&lt;&lt;</button>
-                <button id="btn-review-prev" type="button" class="btn-secondary py-1.5 rounded text-xs font-mono-num" aria-label="Previous Move">&lt;</button>
-                <button id="btn-review-next" type="button" class="btn-secondary py-1.5 rounded text-xs font-mono-num" aria-label="Next Move">&gt;</button>
-                <button id="btn-review-last" type="button" class="btn-secondary py-1.5 rounded text-xs font-mono-num" aria-label="Final Board">&gt;&gt;|</button>
-                <button id="btn-review-results" type="button" class="btn-gold py-1.5 rounded text-xs font-bold">Stats</button>
-              </div>
+              <div id="hud-score-white" class="font-mono-num text-xl sm:text-2xl font-extrabold text-amber-100 shrink-0">2</div>
             </div>
+          </div>
 
-            <!-- Move Log -->
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Move Log</span>
-                <span id="hud-move-total" class="font-mono-num text-[11px] text-slate-400">0 Moves</span>
-              </div>
-              <div id="hud-move-list" class="max-h-36 overflow-y-auto space-y-1 pr-1 text-xs font-mono-num">
-                <div class="text-slate-500 italic py-2 text-center">No moves played yet. Black opens the match.</div>
-              </div>
+          <!-- Territory Progress Bar -->
+          <div class="space-y-1 pt-0.5">
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono-num">
+              <span id="hud-legal-count">4 Legal Moves</span>
+              <span id="hud-empty-count">60 Empty</span>
             </div>
+            <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden flex border">
+              <div id="hud-bar-black" class="bg-slate-950 h-full" style="width: 50%; transition: width 260ms ease;"></div>
+              <div id="hud-bar-white" class="bg-[#f5f2eb] h-full" style="width: 50%; transition: width 260ms ease;"></div>
+            </div>
+            <div class="hidden sm:flex items-center justify-between text-[10px] pt-0.5">
+              <span class="text-slate-400">Position: <strong id="hud-eval-badge" class="font-mono-num text-amber-200">Even</strong></span>
+              <span id="hud-streak-badge" class="font-mono-num text-emerald-300">Corners: 0–0</span>
+            </div>
+          </div>
+
+          <!-- AI Thinking Indicator -->
+          <div id="hud-ai-thinking" class="hidden px-3 py-1.5 rounded-xl border flex items-center justify-center gap-2 text-xs text-amber-300 font-medium" style="background: rgba(212, 175, 55, 0.12); border-color: rgba(212, 175, 55, 0.3);">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span id="hud-ai-thinking-text">Computer is thinking…</span>
           </div>
         </div>
 
-        <!-- Center/Right Column: The 8x8 Emerald Reversi Game Board -->
-        <div class="lg:col-span-8 flex flex-col items-center order-1 lg:order-2">
-          <div class="board-outer-frame w-full max-w-[560px]">
+        <!-- REGION 2: THE 8x8 REVERSI BOARD (Middle on Mobile/Tablet, Right Column on Desktop) -->
+        <div class="game-board-col flex flex-col items-center min-w-0">
+
+          <!-- Live "Waiting in Room" Banner (Visible when host chooses "Wait in Room" before opponent joins) -->
+          <div id="board-waiting-banner" class="hidden w-full max-w-[540px] mb-3 p-3 rounded-2xl border flex flex-wrap items-center justify-between gap-2.5" style="background: linear-gradient(135deg, rgba(15, 77, 58, 0.45) 0%, rgba(12, 16, 22, 0.96) 100%); border-color: rgba(251, 191, 36, 0.45);">
+            <div class="flex items-center gap-2 min-w-0">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 waiting-pulse-ring shrink-0"></span>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-amber-100">Waiting in Room <span id="board-waiting-code" class="font-mono-num text-amber-300">------</span></div>
+                <div class="text-[11px] text-slate-300">Share this code with your friend to start.</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btn-board-wait-copy" type="button" class="btn-secondary px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-200 whitespace-nowrap">Copy Code</button>
+              <button id="btn-board-wait-seat2" type="button" class="btn-gold px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap">+ Join Seat 2</button>
+            </div>
+          </div>
+
+          <div class="board-outer-frame w-full max-w-[540px]">
+            <div id="board-combo-callout" class="hidden board-combo-callout"></div>
             <div class="board-coord-layout">
-              <!-- Top Coordinate Bar (A-H) aligned strictly with the 8 board columns -->
+              <!-- Top Coordinate Bar (A-H) -->
               <div class="board-col-coords font-mono-num" aria-hidden="true">
                 <span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span>
               </div>
 
-              <!-- Left Coordinate Bar (1-8) aligned strictly with the 8 board rows -->
+              <!-- Left Coordinate Bar (1-8) -->
               <div class="board-row-coords font-mono-num" aria-hidden="true">
                 <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
               </div>
@@ -1296,14 +1711,114 @@
               <div id="reversi-board-grid" class="board-grid" role="grid" aria-label="Reversi 8 by 8 Game Board"></div>
             </div>
           </div>
+        </div>
 
-          <!-- Keyboard & Touch Hint Footer -->
-          <div class="mt-2.5 flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400">
-            <span>Tap or click any highlighted square to place a disc</span>
-            <span class="hidden sm:inline">•</span>
-            <span class="hidden sm:inline">Arrow keys + Enter/Space for keyboard navigation</span>
+        <!-- REGION 3: CONTROLS, QUICK CHAT & MOVE LOG (Bottom on Mobile/Tablet, Bottom-Left on Desktop) -->
+        <div class="game-controls-panel lux-panel p-3.5 sm:p-4 rounded-2xl space-y-3 min-w-0">
+          <!-- 4 Action Buttons -->
+          <div class="grid grid-cols-4 sm:grid-cols-2 gap-1.5 sm:gap-2">
+            <button id="btn-game-hint" type="button" class="btn-gold py-2 px-2 sm:px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1 whitespace-nowrap" title="Suggest best move">
+              <span>⚡ Hint</span>
+            </button>
+            <button id="btn-game-undo" type="button" class="btn-secondary py-2 px-2 sm:px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 whitespace-nowrap" title="Undo last turn">
+              <span>↶ Undo</span>
+            </button>
+            <button id="btn-game-restart" type="button" class="btn-secondary py-2 px-2 sm:px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 whitespace-nowrap">
+              <span>↻ Restart</span>
+            </button>
+            <button id="btn-game-leave" type="button" class="btn-secondary py-2 px-2 sm:px-3 rounded-xl text-xs font-semibold text-rose-300 flex items-center justify-center gap-1 whitespace-nowrap">
+              <span>← Leave</span>
+            </button>
+          </div>
+
+          <!-- Hint Recommendation Banner -->
+          <div id="hud-hint-banner" class="hidden p-2 rounded-xl border text-xs text-amber-200 flex items-center justify-between gap-2" style="background: rgba(212, 175, 55, 0.14); border-color: rgba(251, 191, 36, 0.4);">
+            <span id="hud-hint-text" class="truncate">Suggested: D3</span>
+            <button id="btn-hint-dismiss" type="button" class="text-[10px] text-slate-300 px-1.5 shrink-0">✕</button>
+          </div>
+
+          <!-- Stickers & Quick Chat Section -->
+          <div class="settings-section-card space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-300">Stickers &amp; Quick Chat</span>
+              <span id="hud-chat-status" class="text-[10px] font-mono-num text-slate-400">Live</span>
+            </div>
+
+            <!-- 8 Stickers (Single-word labels so they never wrap on any screen) -->
+            <div class="grid grid-cols-4 gap-1.5" id="sticker-buttons-grid">
+              <button id="btn-sticker-knife" type="button" data-sticker="🔪 Ruthless Backstab!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>🔪</span><span class="text-[11px] font-semibold">Knife</span>
+              </button>
+              <button id="btn-sticker-heart" type="button" data-sticker="❤️ Pure Love & Respect!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>❤️</span><span class="text-[11px] font-semibold">Heart</span>
+              </button>
+              <button id="btn-sticker-crying" type="button" data-sticker="😭 Heartbreaking Flip!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>😭</span><span class="text-[11px] font-semibold">Crying</span>
+              </button>
+              <button id="btn-sticker-rose" type="button" data-sticker="🌹 A Rose for That Move!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>🌹</span><span class="text-[11px] font-semibold">Rose</span>
+              </button>
+              <button id="btn-sticker-crown" type="button" data-sticker="👑 Corner King!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>👑</span><span class="text-[11px] font-semibold">King</span>
+              </button>
+              <button id="btn-sticker-fire" type="button" data-sticker="🔥 What a Flip!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>🔥</span><span class="text-[11px] font-semibold">Fire</span>
+              </button>
+              <button id="btn-sticker-brain" type="button" data-sticker="🧠 Smart Move!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>🧠</span><span class="text-[11px] font-semibold">Smart</span>
+              </button>
+              <button id="btn-sticker-zap" type="button" data-sticker="⚡ Your Turn!" class="sticker-chip flex items-center justify-center gap-1 text-amber-100 whitespace-nowrap">
+                <span>⚡</span><span class="text-[11px] font-semibold">Fast</span>
+              </button>
+            </div>
+
+            <!-- Quick Messages -->
+            <div class="grid grid-cols-2 gap-1.5" id="quick-msg-grid">
+              <button id="btn-qmsg-corner" type="button" data-qmsg="🔪 That corner is mine!" class="qmsg-pill text-left truncate text-amber-100">🔪 Corner is mine!</button>
+              <button id="btn-qmsg-gl" type="button" data-qmsg="❤️ Good luck!" class="qmsg-pill text-left truncate text-amber-100">❤️ Good luck!</button>
+              <button id="btn-qmsg-crying" type="button" data-qmsg="😭 Trapped my discs!" class="qmsg-pill text-left truncate text-amber-100">😭 Trapped my discs!</button>
+              <button id="btn-qmsg-rose" type="button" data-qmsg="🌹 A rose for you!" class="qmsg-pill text-left truncate text-amber-100">🌹 A rose for you!</button>
+              <button id="btn-qmsg-wp" type="button" data-qmsg="👑 Well played!" class="qmsg-pill text-left truncate text-slate-200">👑 Well played!</button>
+              <button id="btn-qmsg-rematch" type="button" data-qmsg="🔥 One more game?" class="qmsg-pill text-left truncate text-slate-200">🔥 One more game?</button>
+            </div>
+
+            <!-- Custom Message Input Bar -->
+            <div class="flex items-center gap-1.5">
+              <input id="input-chat-custom" type="text" maxlength="64" placeholder="Type a message…" class="flex-1 min-w-0 px-2.5 py-1.5 rounded-lg bg-[#12161c] border border-amber-500/30 text-xs text-amber-50" aria-label="Type a message" />
+              <button id="btn-chat-send" type="button" class="btn-gold px-3 py-1.5 rounded-lg text-xs font-bold shrink-0">Send</button>
+            </div>
+
+            <!-- Live Reactions Feed -->
+            <div id="hud-chat-feed" class="max-h-20 overflow-y-auto space-y-1 text-[11px] pr-1"></div>
+          </div>
+
+          <!-- Review Scrubber Bar -->
+          <div id="review-scrubber-panel" class="hidden p-2.5 rounded-xl border space-y-2" style="background: rgba(212, 175, 55, 0.1); border-color: rgba(212, 175, 55, 0.35);">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300">Match Review</span>
+              <span id="review-step-label" class="font-mono-num text-xs text-amber-100">Final Board</span>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5">
+              <button id="btn-review-first" type="button" class="btn-secondary py-1 rounded text-xs font-mono-num" aria-label="First Move">|&lt;&lt;</button>
+              <button id="btn-review-prev" type="button" class="btn-secondary py-1 rounded text-xs font-mono-num" aria-label="Previous Move">&lt;</button>
+              <button id="btn-review-next" type="button" class="btn-secondary py-1 rounded text-xs font-mono-num" aria-label="Next Move">&gt;</button>
+              <button id="btn-review-last" type="button" class="btn-secondary py-1 rounded text-xs font-mono-num" aria-label="Final Board">&gt;&gt;|</button>
+              <button id="btn-review-results" type="button" class="btn-gold py-1 rounded text-xs font-bold">Stats</button>
+            </div>
+          </div>
+
+          <!-- Move History Log -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Move History</span>
+              <span id="hud-move-total" class="font-mono-num text-[10px] text-slate-400">0 Moves</span>
+            </div>
+            <div id="hud-move-list" class="max-h-24 overflow-y-auto space-y-1 pr-1 text-xs font-mono-num">
+              <div class="text-slate-500 italic py-1.5 text-center text-[11px]">No moves yet. Black moves first.</div>
+            </div>
           </div>
         </div>
+
       </div>
     </section>
   </main>
@@ -1386,92 +1901,143 @@
 
   <!-- ==================== MODAL 2: SETTINGS & AUDIO / ACCESSIBILITY ==================== -->
   <div id="modal-settings" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
-    <div class="lux-panel rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-5 border border-amber-400/35 max-h-[90vh] overflow-y-auto">
+    <div class="lux-panel rounded-2xl max-w-xl w-full p-5 sm:p-6 space-y-4 border border-amber-400/40 max-h-[92vh] overflow-y-auto">
+      <!-- Header -->
       <div class="flex items-center justify-between border-b border-amber-500/15 pb-3">
-        <h2 id="settings-modal-title" class="font-display text-lg sm:text-xl font-bold text-amber-50">Settings &amp; Preferences</h2>
-        <button id="btn-settings-close" type="button" class="btn-secondary px-2.5 py-1 rounded-lg text-xs" aria-label="Close Settings">✕ Close</button>
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">Personalization &amp; Studio Controls</span>
+          <h2 id="settings-modal-title" class="font-display text-lg sm:text-xl font-bold text-amber-50">Settings &amp; Preferences</h2>
+        </div>
+        <button id="btn-settings-close" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-semibold" aria-label="Close Settings">✕ Close</button>
       </div>
 
-      <!-- Audio Controls -->
-      <div class="space-y-3">
+      <!-- SECTION 1: DUAL-TONE BOARD & VISUAL THEME SELECTOR -->
+      <div class="settings-section-card space-y-2.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Sound &amp; Audio</span>
-          <button id="btn-settings-test-sound" type="button" class="btn-secondary px-3 py-1 rounded-lg text-xs font-semibold">♪ Test Sound</button>
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300">1. Dual-Tone Board Theme</span>
+          <span id="settings-active-theme-badge" class="text-[11px] font-mono-num text-emerald-300">Emerald Velvet</span>
         </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="settings-theme-grid">
+          <button id="btn-settings-theme-emerald" type="button" data-theme="emerald" class="theme-swatch-card is-active-theme">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-4 h-4 rounded border border-amber-400/50 inline-block" style="background: linear-gradient(135deg, #1a6c50 50%, #082c21 50%);"></span>
+              <span class="text-xs font-bold text-amber-100">Emerald</span>
+            </div>
+            <div class="text-[10px] text-slate-400">Tournament Felt</div>
+          </button>
 
-        <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer">
-          <span>Master Mute</span>
-          <input id="chk-settings-mute" type="checkbox" class="w-4 h-4 rounded" />
-        </label>
+          <button id="btn-settings-theme-obsidian" type="button" data-theme="obsidian" class="theme-swatch-card">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-4 h-4 rounded border border-amber-400/50 inline-block" style="background: linear-gradient(135deg, #262f3d 50%, #0b0f15 50%);"></span>
+              <span class="text-xs font-bold text-amber-100">Obsidian</span>
+            </div>
+            <div class="text-[10px] text-slate-400">Carbon Slate</div>
+          </button>
 
-        <div class="space-y-1">
-          <div class="flex justify-between text-xs text-slate-300">
-            <label for="rng-settings-sfx">Sound Effects Volume</label>
-            <span id="lbl-settings-sfx" class="font-mono-num text-amber-300">75%</span>
-          </div>
-          <input id="rng-settings-sfx" type="range" min="0" max="100" value="75" class="w-full" />
-        </div>
+          <button id="btn-settings-theme-walnut" type="button" data-theme="walnut" class="theme-swatch-card">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-4 h-4 rounded border border-amber-400/50 inline-block" style="background: linear-gradient(135deg, #483121 50%, #1c120b 50%);"></span>
+              <span class="text-xs font-bold text-amber-100">Walnut</span>
+            </div>
+            <div class="text-[10px] text-slate-400">Imperial Wood</div>
+          </button>
 
-        <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer">
-          <span>Ambient Background Lounge Tone (Optional)</span>
-          <input id="chk-settings-music" type="checkbox" class="w-4 h-4 rounded" />
-        </label>
-
-        <div class="space-y-1">
-          <div class="flex justify-between text-xs text-slate-300">
-            <label for="rng-settings-music">Music Volume</label>
-            <span id="lbl-settings-music" class="font-mono-num text-amber-300">30%</span>
-          </div>
-          <input id="rng-settings-music" type="range" min="0" max="100" value="30" class="w-full" />
+          <button id="btn-settings-theme-sapphire" type="button" data-theme="sapphire" class="theme-swatch-card">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-4 h-4 rounded border border-amber-400/50 inline-block" style="background: linear-gradient(135deg, #17385e 50%, #071324 50%);"></span>
+              <span class="text-xs font-bold text-amber-100">Sapphire</span>
+            </div>
+            <div class="text-[10px] text-slate-400">Regency Navy</div>
+          </button>
         </div>
       </div>
 
-      <!-- Gameplay & Accessibility Preferences -->
-      <div class="space-y-3 border-t border-amber-500/15 pt-4">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-300 block">Gameplay &amp; Accessibility</span>
+      <!-- SECTION 2: SOUND & ACOUSTIC STUDIO (Optimized 2-Column Layout) -->
+      <div class="settings-section-card space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300">2. Sound &amp; Acoustic Studio</span>
+          <button id="btn-settings-test-sound" type="button" class="btn-secondary px-3 py-1 rounded-lg text-xs font-semibold text-amber-200">♪ Test Sound</button>
+        </div>
 
-        <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer">
-          <span>Reduced Motion (Disable 3D Flip &amp; Particle Animations)</span>
-          <input id="chk-settings-reduced-motion" type="checkbox" class="w-4 h-4 rounded" />
-        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="p-2.5 rounded-xl bg-[#12161c] border border-amber-500/15 space-y-2">
+            <label class="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer">
+              <span>Master Audio Mute</span>
+              <input id="chk-settings-mute" type="checkbox" class="w-4 h-4 rounded" />
+            </label>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] text-slate-300">
+                <label for="rng-settings-sfx">SFX Volume</label>
+                <span id="lbl-settings-sfx" class="font-mono-num text-amber-300">75%</span>
+              </div>
+              <input id="rng-settings-sfx" type="range" min="0" max="100" value="75" class="w-full lux-range" />
+            </div>
+          </div>
 
-        <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer">
-          <span>Show Legal Move Indicators</span>
-          <input id="chk-settings-legal-hints" type="checkbox" checked class="w-4 h-4 rounded" />
-        </label>
+          <div class="p-2.5 rounded-xl bg-[#12161c] border border-amber-500/15 space-y-2">
+            <label class="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer">
+              <span>Ambient Lounge Synth</span>
+              <input id="chk-settings-music" type="checkbox" class="w-4 h-4 rounded" />
+            </label>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] text-slate-300">
+                <label for="rng-settings-music">Lounge Volume</label>
+                <span id="lbl-settings-music" class="font-mono-num text-amber-300">30%</span>
+              </div>
+              <input id="rng-settings-music" type="range" min="0" max="100" value="30" class="w-full lux-range" />
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <label class="flex items-center justify-between text-xs sm:text-sm text-slate-200 cursor-pointer">
-          <span>Highlight Captured Discs on Hover / Focus</span>
-          <input id="chk-settings-capture-preview" type="checkbox" checked class="w-4 h-4 rounded" />
-        </label>
+      <!-- SECTION 3: GAMEPLAY AIDS, DEFAULTS & ACCESSIBILITY -->
+      <div class="settings-section-card space-y-3">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-300 block">3. Gameplay Aids &amp; Match Defaults</span>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <label class="p-2.5 rounded-xl bg-[#12161c] border border-amber-500/15 flex items-center justify-between gap-2 text-xs text-slate-200 cursor-pointer">
+            <span>Legal Move Rings</span>
+            <input id="chk-settings-legal-hints" type="checkbox" checked class="w-4 h-4 rounded shrink-0" />
+          </label>
+
+          <label class="p-2.5 rounded-xl bg-[#12161c] border border-amber-500/15 flex items-center justify-between gap-2 text-xs text-slate-200 cursor-pointer">
+            <span>Capture Preview</span>
+            <input id="chk-settings-capture-preview" type="checkbox" checked class="w-4 h-4 rounded shrink-0" />
+          </label>
+
+          <label class="p-2.5 rounded-xl bg-[#12161c] border border-amber-500/15 flex items-center justify-between gap-2 text-xs text-slate-200 cursor-pointer">
+            <span>Reduced Motion</span>
+            <input id="chk-settings-reduced-motion" type="checkbox" class="w-4 h-4 rounded shrink-0" />
+          </label>
+        </div>
 
         <div class="grid grid-cols-2 gap-3 pt-1">
           <div>
-            <label for="select-settings-default-color" class="block text-xs text-slate-300 mb-1">Default Disc Color</label>
-            <select id="select-settings-default-color" class="w-full px-2.5 py-1.5 rounded-lg bg-[#090b0e] border border-amber-500/25 text-xs text-amber-50">
-              <option value="B">Black (1st)</option>
-              <option value="W">White (2nd)</option>
-              <option value="random">Random</option>
+            <label for="select-settings-default-color" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Default Disc Color</label>
+            <select id="select-settings-default-color" class="w-full px-3 py-2 rounded-xl bg-[#12161c] border border-amber-500/25 text-xs text-amber-50">
+              <option value="B">Black (Moves 1st)</option>
+              <option value="W">White (Moves 2nd)</option>
+              <option value="random">Random Coin Toss</option>
             </select>
           </div>
           <div>
-            <label for="select-settings-default-timer" class="block text-xs text-slate-300 mb-1">Default Turn Timer</label>
-            <select id="select-settings-default-timer" class="w-full px-2.5 py-1.5 rounded-lg bg-[#090b0e] border border-amber-500/25 text-xs text-amber-50">
-              <option value="0">Untimed</option>
-              <option value="15">15s / Turn</option>
-              <option value="30">30s / Turn</option>
-              <option value="60">60s / Turn</option>
+            <label for="select-settings-default-timer" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Default Turn Timer</label>
+            <select id="select-settings-default-timer" class="w-full px-3 py-2 rounded-xl bg-[#12161c] border border-amber-500/25 text-xs text-amber-50">
+              <option value="0">Untimed (Standard)</option>
+              <option value="15">15s / Turn (Blitz)</option>
+              <option value="30">30s / Turn (Rapid)</option>
+              <option value="60">60s / Turn (Classical)</option>
             </select>
           </div>
         </div>
       </div>
 
       <!-- Footer Actions -->
-      <div class="flex flex-wrap items-center justify-between gap-2 border-t border-amber-500/15 pt-4">
-        <button id="btn-settings-replay-tutorial" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs font-semibold">Replay Tutorial</button>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <button id="btn-settings-replay-tutorial" type="button" class="btn-secondary px-3.5 py-2 rounded-xl text-xs font-semibold">Replay Tutorial</button>
         <div class="flex items-center gap-2">
-          <button id="btn-settings-reset" type="button" class="btn-secondary px-3 py-2 rounded-xl text-xs text-rose-300">Reset Settings</button>
-          <button id="btn-settings-done" type="button" class="btn-gold px-4 py-2 rounded-xl text-xs font-bold">Done</button>
+          <button id="btn-settings-reset" type="button" class="btn-secondary px-3.5 py-2 rounded-xl text-xs text-rose-300">Reset Settings</button>
+          <button id="btn-settings-done" type="button" class="btn-gold px-5 py-2 rounded-xl text-xs font-bold">Done</button>
         </div>
       </div>
     </div>
@@ -1504,12 +2070,51 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL 4: MATCH HISTORY & LOCAL PROFILE ==================== -->
+  <!-- ==================== MODAL 4: PLAYER PROFILE & MATCH HISTORY ==================== -->
   <div id="modal-history" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="history-modal-title">
-    <div class="lux-panel rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 border border-amber-400/35 max-h-[88vh] overflow-y-auto">
+    <div class="lux-panel rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 border border-amber-400/35 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-amber-500/15 pb-3">
-        <h2 id="history-modal-title" class="font-display text-lg font-bold text-amber-50">Match History &amp; Career Record</h2>
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">Player Identity &amp; Statistics</span>
+          <h2 id="history-modal-title" class="font-display text-lg sm:text-xl font-bold text-amber-50">Player Profile &amp; Career Record</h2>
+        </div>
         <button id="btn-history-close" type="button" class="btn-secondary px-2.5 py-1 rounded-lg text-xs">✕ Close</button>
+      </div>
+
+      <!-- Player Profile Card: Save Display Name & Title -->
+      <div class="settings-section-card space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl border border-amber-400/40 flex items-center justify-center text-amber-300 font-display font-bold text-sm" style="background: rgba(15, 77, 58, 0.5);" id="profile-avatar-initials">GM</div>
+            <div>
+              <div class="text-xs font-bold text-amber-100" id="profile-card-display-name">Grandmaster</div>
+              <div class="text-[10px] uppercase tracking-wider text-amber-400" id="profile-card-display-title">Grandmaster • Verified Player</div>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono-num px-2 py-0.5 rounded text-emerald-300 border" style="background: rgba(15, 77, 58, 0.4); border-color: rgba(52, 211, 153, 0.3);">Saved Locally</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+          <div class="sm:col-span-2">
+            <label for="input-profile-name" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Your Player Name</label>
+            <input id="input-profile-name" type="text" maxlength="20" value="Grandmaster" placeholder="Enter your display name…" class="w-full px-3 py-2 rounded-xl bg-[#12161c] border border-amber-500/30 text-xs text-amber-50" />
+          </div>
+          <div>
+            <label for="select-profile-title" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">Player Title</label>
+            <select id="select-profile-title" class="w-full px-2.5 py-2 rounded-xl bg-[#12161c] border border-amber-500/30 text-xs text-amber-50">
+              <option value="Grandmaster">Grandmaster</option>
+              <option value="Tactician">Tactician</option>
+              <option value="Corner Hunter">Corner Hunter</option>
+              <option value="Strategist">Strategist</option>
+              <option value="Challenger">Challenger</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-[11px] text-slate-400">Used automatically in AI, Local &amp; Online modes</span>
+          <button id="btn-profile-save" type="button" class="btn-gold px-4 py-1.5 rounded-xl text-xs font-bold">Save Profile</button>
+        </div>
       </div>
 
       <div class="grid grid-cols-4 gap-2 text-center">
@@ -1548,6 +2153,71 @@
       <div class="flex items-center justify-end gap-2 pt-2">
         <button id="btn-confirm-cancel" type="button" class="btn-secondary px-4 py-2 rounded-xl text-xs font-semibold">Cancel</button>
         <button id="btn-confirm-accept" type="button" class="btn-gold px-4 py-2 rounded-xl text-xs font-bold">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 6: PRIVATE ROOM WAITING POPUP ==================== -->
+  <div id="modal-waiting-room" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="waiting-modal-title">
+    <div class="lux-panel rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 border border-amber-400/45">
+      <div class="flex items-center justify-between border-b border-amber-500/15 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-3 h-3 rounded-full bg-amber-400 waiting-pulse-ring"></span>
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-amber-400 block">Private Match Lobby</span>
+            <h2 id="waiting-modal-title" class="font-display text-lg font-bold text-amber-50">Waiting for Opponent…</h2>
+          </div>
+        </div>
+        <span class="text-[11px] font-mono-num px-2 py-0.5 rounded text-emerald-300 border" style="background: rgba(15, 77, 58, 0.45); border-color: rgba(52, 211, 153, 0.35);">1 / 2 Joined</span>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Your private room is live and locked to your session. Share the 6-character code below with your opponent, or enter the room board while you wait.
+      </p>
+
+      <!-- Room Code Showcase Card -->
+      <div class="p-3.5 rounded-xl bg-[#090b0e] border border-amber-500/30 space-y-2.5 text-center">
+        <div class="text-[10px] uppercase tracking-widest text-slate-400">Private Room Code</div>
+        <div id="waiting-modal-code" class="font-mono-num text-2xl sm:text-3xl font-extrabold tracking-widest text-amber-300">------</div>
+        <div id="waiting-modal-url" class="font-mono-num text-[11px] text-slate-400 truncate px-2">https://flix-reversi.app/#room=------</div>
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <button id="btn-waiting-copy-code" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-200">Copy Code</button>
+          <button id="btn-waiting-copy-link" type="button" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-semibold">Copy Link</button>
+        </div>
+      </div>
+
+      <!-- Seat Status Preview -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="p-2.5 rounded-xl bg-[#090b0e] border border-amber-500/20 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0"></span>
+          <div class="truncate">
+            <div class="font-bold text-amber-100 truncate" id="waiting-host-name">Host</div>
+            <div class="text-[10px] text-emerald-300">Host Ready</div>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#090b0e] border border-amber-500/20 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 waiting-pulse-ring shrink-0"></span>
+          <div class="truncate">
+            <div class="font-bold text-slate-300">Seat 2</div>
+            <div class="text-[10px] text-amber-300">Awaiting Player…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Action: Wait in Room (Enter Board) -->
+      <div class="space-y-2 pt-1">
+        <button id="btn-waiting-enter-room" type="button" class="btn-gold w-full py-3 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2">
+          <span>Wait in Room (Enter Board)</span>
+          <span>→</span>
+        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="btn-waiting-connect-seat2" type="button" class="btn-secondary py-2 px-3 rounded-xl text-xs font-semibold text-amber-200">
+            + Join 2nd Seat Now
+          </button>
+          <button id="btn-waiting-cancel-room" type="button" class="btn-secondary py-2 px-3 rounded-xl text-xs font-semibold text-rose-300">
+            Cancel Room
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2576,6 +3246,34 @@
         }
       }
 
+      SharedRoomLedger.prototype.sendReaction = function({ roomCode, senderColor, senderName, text }) {
+        const reaction = {
+          id: 'rx_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+          roomCode: roomCode || 'LOCAL',
+          senderColor,
+          senderName,
+          text,
+          timestamp: Date.now(),
+        };
+        if (roomCode) {
+          const room = this.loadRoom(roomCode);
+          if (room) {
+            room.lastReaction = reaction;
+            room.version++;
+            this.saveAndBroadcast(room, [
+              {
+                eventId: reaction.id,
+                type: 'PLAYER_REACTION',
+                timestamp: reaction.timestamp,
+                payload: reaction,
+              },
+            ]);
+            return reaction;
+          }
+        }
+        return reaction;
+      };
+
       const sharedLedger = new SharedRoomLedger();
 
       // =========================================================================
@@ -2584,12 +3282,22 @@
       const SETTINGS_KEY = 'flix_reversi_settings_v1';
       const HISTORY_KEY = 'flix_reversi_history_v1';
 
+      const THEME_LABELS = {
+        emerald: 'Emerald Velvet',
+        obsidian: 'Obsidian Slate',
+        walnut: 'Imperial Walnut',
+        sapphire: 'Royal Sapphire',
+      };
+
       const appSettings = {
-        reducedMotion: window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        reducedMotion: false,
         showLegalHints: true,
         showCapturePreview: true,
         defaultColor: 'B',
         defaultTimer: 0,
+        boardTheme: 'emerald',
+        playerName: 'Grandmaster',
+        playerTitle: 'Grandmaster',
       };
 
       function loadSettings() {
@@ -2607,12 +3315,70 @@
         applyBodyClasses();
       }
 
+      function applyBoardTheme(themeName) {
+        const theme = THEME_LABELS[themeName] ? themeName : 'emerald';
+        appSettings.boardTheme = theme;
+        document.body.setAttribute('data-board-theme', theme);
+        document.querySelectorAll('[data-theme]').forEach((b) => {
+          b.classList.toggle('is-active-theme', b.getAttribute('data-theme') === theme);
+        });
+        const label = THEME_LABELS[theme];
+        
+        const settingsThemeLbl = document.getElementById('settings-active-theme-badge');
+        if (settingsThemeLbl) settingsThemeLbl.textContent = label;
+      }
+
+      function syncProfileUI() {
+        const cleanName = (appSettings.playerName || 'Grandmaster').trim().slice(0, 20) || 'Grandmaster';
+        const cleanTitle = appSettings.playerTitle || 'Grandmaster';
+        appSettings.playerName = cleanName;
+        appSettings.playerTitle = cleanTitle;
+
+        const navName = document.getElementById('nav-profile-name');
+        if (navName) navName.textContent = cleanName;
+
+        const cardName = document.getElementById('profile-card-display-name');
+        if (cardName) cardName.textContent = cleanName;
+
+        const cardTitle = document.getElementById('profile-card-display-title');
+        if (cardTitle) cardTitle.textContent = `${cleanTitle} • Verified Player`;
+
+        const avatar = document.getElementById('profile-avatar-initials');
+        if (avatar) {
+          const parts = cleanName.split(/\s+/).filter(Boolean);
+          const initials = parts.length >= 2
+            ? (parts[0][0] + parts[1][0]).toUpperCase()
+            : cleanName.slice(0, 2).toUpperCase();
+          avatar.textContent = initials || 'GM';
+        }
+
+        const profInput = document.getElementById('input-profile-name');
+        if (profInput && document.activeElement !== profInput) profInput.value = cleanName;
+
+        const profTitleSelect = document.getElementById('select-profile-title');
+        if (profTitleSelect) profTitleSelect.value = cleanTitle;
+
+        // Pre-populate mode setup name fields with saved profile name
+        const aiNameInput = document.getElementById('input-ai-player-name');
+        if (aiNameInput) aiNameInput.value = cleanName;
+
+        const onlineNameInput = document.getElementById('input-online-nickname');
+        if (onlineNameInput) onlineNameInput.value = cleanName;
+
+        const localBlackInput = document.getElementById('input-local-black');
+        if (localBlackInput && (localBlackInput.value === 'Player 1 (Black)' || localBlackInput.value === 'Grandmaster')) {
+          localBlackInput.value = cleanName;
+        }
+      }
+
       function applyBodyClasses() {
         if (appSettings.reducedMotion) {
           document.body.classList.add('reduced-motion');
         } else {
           document.body.classList.remove('reduced-motion');
         }
+        applyBoardTheme(appSettings.boardTheme || 'emerald');
+        syncProfileUI();
       }
 
       function loadMatchHistory() {
@@ -2638,6 +3404,7 @@
         const list = loadMatchHistory();
         const badge = document.getElementById('nav-history-badge');
         if (badge) badge.textContent = String(list.length);
+        
       }
 
       // Active Session State
@@ -2658,6 +3425,10 @@
       let reviewStepIndex = null;
       let hoveredPreviewCells = [];
       let focusedCellCoord = { row: 2, col: 3 };
+      let activeHintCoord = null;
+      let stateUndoStack = [];
+      let chatReactionsLog = [];
+      let seenReactionIds = new Set();
 
       // Online session state
       let onlineSession = {
@@ -2715,7 +3486,7 @@
         for (let r = 0; r < 8; r++) {
           for (let c = 0; c < 8; c++) {
             const cell = document.createElement('div');
-            cell.className = 'board-cell';
+            cell.className = `board-cell ${(r + c) % 2 === 0 ? 'cell-light' : 'cell-dark'}`;
             const val = previewGameState.board[r][c];
             const key = `${r},${c}`;
             const isPlaced = previewGameState.lastMove && previewGameState.lastMove.row === r && previewGameState.lastMove.col === c;
@@ -2823,6 +3594,8 @@
         reviewStepIndex = null;
         isAiThinking = false;
         lastAnimatedMoveKey = '';
+        activeHintCoord = null;
+        stateUndoStack = [];
         gameState = createNewGame({ now: Date.now() });
 
         document.getElementById('hud-mode-badge').textContent = `VS AI • ${diffLabel.toUpperCase()}`;
@@ -2850,6 +3623,8 @@
         reviewStepIndex = null;
         isAiThinking = false;
         lastAnimatedMoveKey = '';
+        activeHintCoord = null;
+        stateUndoStack = [];
         gameState = createNewGame({ now: Date.now() });
 
         document.getElementById('hud-mode-badge').textContent = 'LOCAL PASS & PLAY';
@@ -2863,20 +3638,50 @@
         audio.play('confirm');
       }
 
+      function syncOnlineCreateLockUI() {
+        const hasActiveRoom = Boolean(onlineSession.roomCode);
+        const createBtn = document.getElementById('btn-online-create-room');
+        const joinBtn = document.getElementById('btn-online-join-room');
+        if (createBtn) {
+          if (hasActiveRoom) {
+            createBtn.textContent = `Room Active (${onlineSession.roomCode}) — Open Waiting Lobby`;
+          } else {
+            createBtn.textContent = 'Create Private Room';
+          }
+        }
+        if (joinBtn) {
+          joinBtn.disabled = hasActiveRoom;
+        }
+      }
+
+      function syncBoardWaitingBanner(room) {
+        const banner = document.getElementById('board-waiting-banner');
+        if (!banner) return;
+        const isWaiting = activeMode === 'online' && room && (!room.players.B || !room.players.W);
+        banner.classList.toggle('hidden', !isWaiting);
+        if (isWaiting) {
+          const codeEl = document.getElementById('board-waiting-code');
+          if (codeEl) codeEl.textContent = room.roomCode;
+        }
+      }
+
       function startOnlineMatchFromRoom(room) {
         activeMode = 'online';
         gameState = room.gameState;
         turnTimerSeconds = room.timerSecondsPerTurn || 0;
         playerNames = {
-          B: (room.players.B && room.players.B.nickname) ? room.players.B.nickname : 'Black (Waiting)',
-          W: (room.players.W && room.players.W.nickname) ? room.players.W.nickname : 'White (Waiting)',
+          B: (room.players.B && room.players.B.nickname) ? room.players.B.nickname : 'Waiting for Opponent…',
+          W: (room.players.W && room.players.W.nickname) ? room.players.W.nickname : 'Waiting for Opponent…',
         };
         reviewStepIndex = null;
         isAiThinking = false;
         lastAnimatedMoveKey = '';
 
+        const bothPresent = Boolean(room.players.B && room.players.W);
         const seatInfo = onlineSession.dualClientActive
           ? 'DUAL-SEAT ONLINE'
+          : !bothPresent
+          ? `WAITING IN ROOM • ${onlineSession.assignedColor === 'B' ? 'BLACK' : 'WHITE'}`
           : `ONLINE • YOU ARE ${onlineSession.assignedColor === 'B' ? 'BLACK' : 'WHITE'}`;
         document.getElementById('hud-mode-badge').textContent = seatInfo;
         const roomPill = document.getElementById('hud-room-code-pill');
@@ -2884,10 +3689,12 @@
         roomPill.classList.remove('hidden');
         document.getElementById('hud-connection-bar').classList.remove('hidden');
         document.getElementById('modal-results').classList.add('hidden');
+        document.getElementById('modal-waiting-room').classList.add('hidden');
 
-        updateConnectionStatusUI(onlineSession.connectionStatus);
+        syncBoardWaitingBanner(room);
+        updateConnectionStatusUI(bothPresent ? onlineSession.connectionStatus : 'Waiting for Opponent');
         switchView('game');
-        resetTurnTimer();
+        if (bothPresent) resetTurnTimer();
         renderGameplayUI();
       }
 
@@ -2901,6 +3708,9 @@
         txt.textContent = status;
         if (status === 'Connected' || status === 'Connection Restored') {
           dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+          reconBtn.classList.add('hidden');
+        } else if (status === 'Waiting for Opponent') {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 waiting-pulse-ring';
           reconBtn.classList.add('hidden');
         } else if (status === 'Connecting' || status === 'Reconnecting') {
           dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400';
@@ -2996,6 +3806,8 @@
           return !isAiThinking && gameState.currentTurn === aiHumanColor;
         }
         if (activeMode === 'online') {
+          const room = onlineSession.roomCode ? sharedLedger.loadRoom(onlineSession.roomCode) : null;
+          if (!room || !room.players.B || !room.players.W) return false;
           if (onlineSession.connectionStatus !== 'Connected' && onlineSession.connectionStatus !== 'Connection Restored') {
             return false;
           }
@@ -3004,6 +3816,95 @@
         }
         return true;
       }
+
+      function formatReactionTimestamp(ts) {
+        const d = new Date(ts || Date.now());
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        const ss = String(d.getSeconds()).padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
+      }
+
+      function triggerReactionBubble(color, senderName, text, reactionId, timestamp) {
+        const rid = reactionId || ('rx_' + Date.now() + '_' + Math.random());
+        if (seenReactionIds.has(rid)) return;
+        seenReactionIds.add(rid);
+
+        const ts = timestamp || Date.now();
+        const timeStr = formatReactionTimestamp(ts);
+
+        audio.play('confirm');
+        const bubbleId = color === 'W' ? 'hud-reaction-white' : 'hud-reaction-black';
+        const bubble = document.getElementById(bubbleId);
+        if (bubble) {
+          bubble.classList.remove('hidden');
+          bubble.style.animation = 'none';
+          void bubble.offsetWidth;
+          bubble.style.animation = '';
+          bubble.innerHTML = `<span class="reaction-bubble-text">${text}</span><span class="reaction-bubble-time font-mono-num">${timeStr}</span>`;
+          if (bubble._hideTimer) clearTimeout(bubble._hideTimer);
+          bubble._hideTimer = setTimeout(() => {
+            bubble.classList.add('hidden');
+          }, 3600);
+        }
+
+        chatReactionsLog.unshift({ senderName, color, text, ts, timeStr });
+        chatReactionsLog = chatReactionsLog.slice(0, 20);
+        const feed = document.getElementById('hud-chat-feed');
+        if (feed) {
+          feed.innerHTML = '';
+          for (const item of chatReactionsLog) {
+            const row = document.createElement('div');
+            row.className = 'px-2.5 py-1.5 rounded-lg bg-[#090b0e] border border-amber-500/20 flex items-center justify-between gap-2';
+            const discClass = item.color === 'W' ? 'disc-white' : 'disc-black';
+            row.innerHTML = `
+              <div class="flex items-center gap-1.5 min-w-0 truncate">
+                <span class="w-2.5 h-2.5 rounded-full reversi-disc ${discClass} shrink-0 inline-block"></span>
+                <span class="font-bold text-amber-200 shrink-0">${item.senderName}:</span>
+                <span class="text-amber-50 truncate">${item.text}</span>
+              </div>
+              <span class="font-mono-num text-[10px] px-1.5 py-0.5 rounded text-amber-300 shrink-0" style="background: rgba(212, 175, 55, 0.14);">${item.timeStr}</span>
+            `;
+            feed.appendChild(row);
+          }
+        }
+      }
+
+      function showBoardComboCallout(text) {
+        if (appSettings.reducedMotion) return;
+        const el = document.getElementById('board-combo-callout');
+        if (!el) return;
+        el.classList.remove('hidden');
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+        el.textContent = text;
+        setTimeout(() => {
+          el.classList.add('hidden');
+        }, 1850);
+      }
+
+      function evaluateAndCheckCombo(moveRecord) {
+        if (!moveRecord) return;
+        const isCorner =
+          (moveRecord.row === 0 && moveRecord.col === 0) ||
+          (moveRecord.row === 0 && moveRecord.col === 7) ||
+          (moveRecord.row === 7 && moveRecord.col === 0) ||
+          (moveRecord.row === 7 && moveRecord.col === 7);
+        if (isCorner) {
+          showBoardComboCallout(`👑 Corner Seized (${moveRecord.notation})!`);
+        } else if (moveRecord.captured.length >= 4) {
+          showBoardComboCallout(`🔥 Mega Outflank! +${moveRecord.captured.length} Discs`);
+        } else if (moveRecord.skippedOpponent) {
+          showBoardComboCallout(`⚡ Forced Pass! ${getPlayerName(moveRecord.player)} Moves Again`);
+        }
+      }
+
+      eventBus.on('PLAYER_REACTION', (ev) => {
+        if (ev.payload) {
+          triggerReactionBubble(ev.payload.senderColor, ev.payload.senderName, ev.payload.text, ev.eventId, ev.payload.timestamp || ev.timestamp);
+        }
+      });
 
       function renderGameplayUI() {
         const viewData = getDisplayedBoardState();
@@ -3030,6 +3931,38 @@
         const blackPct = Math.round((viewData.blackScore / totalDiscs) * 100);
         document.getElementById('hud-bar-black').style.width = `${blackPct}%`;
         document.getElementById('hud-bar-white').style.width = `${100 - blackPct}%`;
+
+        const evalBadge = document.getElementById('hud-eval-badge');
+        if (evalBadge) {
+          const rawEval = Math.round(evaluateBoardMedium(viewData.board, 'B') / 10);
+          if (Math.abs(rawEval) <= 1) {
+            evalBadge.textContent = 'Even (0.0)';
+            evalBadge.className = 'font-mono-num text-amber-200';
+          } else if (rawEval > 0) {
+            evalBadge.textContent = `+${rawEval} Black Edge`;
+            evalBadge.className = 'font-mono-num text-emerald-300';
+          } else {
+            evalBadge.textContent = `+${Math.abs(rawEval)} White Edge`;
+            evalBadge.className = 'font-mono-num text-amber-300';
+          }
+        }
+        const streakBadge = document.getElementById('hud-streak-badge');
+        if (streakBadge) {
+          let bC = 0, wC = 0;
+          for (const [cr, cc] of [[0,0],[0,7],[7,0],[7,7]]) {
+            if (viewData.board[cr][cc] === 'B') bC++;
+            else if (viewData.board[cr][cc] === 'W') wC++;
+          }
+          streakBadge.textContent = `Corners: ${bC}–${wC}`;
+        }
+        const undoBtn = document.getElementById('btn-game-undo');
+        if (undoBtn) {
+          undoBtn.disabled = activeMode === 'online' || stateUndoStack.length === 0 || isAiThinking || reviewStepIndex !== null;
+        }
+        const hintBtn = document.getElementById('btn-game-hint');
+        if (hintBtn) {
+          hintBtn.disabled = !canInteract || viewData.legalMoves.length === 0;
+        }
 
         const emptyCount = 64 - (viewData.blackScore + viewData.whiteScore);
         document.getElementById('hud-legal-count').textContent =
@@ -3101,7 +4034,9 @@
               : 'Empty square';
             btn.setAttribute('aria-label', `${alg} (Row ${r + 1}, Column ${c + 1}): ${stateDesc}`);
 
-            btn.className = `board-cell ${isLegal ? 'is-legal' : ''} ${isLastPlaced ? 'last-move-cell' : ''}`;
+            const isHintBest = activeHintCoord && activeHintCoord.row === r && activeHintCoord.col === c;
+            const toneClass = (r + c) % 2 === 0 ? 'cell-light' : 'cell-dark';
+            btn.className = `board-cell ${toneClass} ${isLegal ? 'is-legal' : ''} ${isLastPlaced ? 'last-move-cell' : ''} ${isHintBest ? 'hint-best-cell' : ''}`;
 
             if (hoshiCoords.has(key)) {
               const hoshi = document.createElement('span');
@@ -3127,9 +4062,6 @@
             } else if (isLegal && appSettings.showLegalHints) {
               const ind = document.createElement('div');
               ind.className = 'legal-indicator';
-              if (appSettings.showCapturePreview && capturedList.length > 1) {
-                ind.textContent = String(capturedList.length);
-              }
               btn.appendChild(ind);
             }
 
@@ -3256,13 +4188,18 @@
           return;
         }
 
+        const snapshotBeforeMove = JSON.parse(JSON.stringify(gameState));
         const result = applyMove(gameState, row, col, gameState.currentTurn, Date.now());
         if (!result.accepted) {
           for (const ev of result.events) eventBus.emit(ev);
           return;
         }
 
+        stateUndoStack.push(snapshotBeforeMove);
+        activeHintCoord = null;
+        document.getElementById('hud-hint-banner').classList.add('hidden');
         gameState = result.state;
+        evaluateAndCheckCombo(result.moveRecord);
         for (const ev of result.events) {
           eventBus.emit(ev);
         }
@@ -3471,16 +4408,31 @@
           if (currentView === 'setup' && bothPresent) {
             audio.play('opponent_join');
             document.getElementById('online-waiting-lobby').classList.add('hidden');
+            document.getElementById('modal-waiting-room').classList.add('hidden');
+            onlineSession.connectionStatus = 'Connected';
             startOnlineMatchFromRoom(updatedRoom);
             return;
           }
 
           if (currentView === 'game' && activeMode === 'online') {
+            const wasWaiting = !document.getElementById('board-waiting-banner').classList.contains('hidden');
+            if (wasWaiting && bothPresent) {
+              audio.play('opponent_join');
+              onlineSession.connectionStatus = 'Connected';
+              updateConnectionStatusUI('Connected');
+              showNotification({
+                category: 'info',
+                title: 'Opponent Joined!',
+                message: 'Both seats confirmed. Match is now live!',
+                durationMs: 3000,
+              });
+            }
+            syncBoardWaitingBanner(updatedRoom);
             const prevStatus = gameState.status;
             gameState = updatedRoom.gameState;
             playerNames = {
-              B: updatedRoom.players.B ? updatedRoom.players.B.nickname : 'Black',
-              W: updatedRoom.players.W ? updatedRoom.players.W.nickname : 'White',
+              B: updatedRoom.players.B ? updatedRoom.players.B.nickname : 'Waiting for Opponent…',
+              W: updatedRoom.players.W ? updatedRoom.players.W.nickname : 'Waiting for Opponent…',
             };
 
             const myColor = onlineSession.assignedColor || 'B';
@@ -3623,7 +4575,7 @@
               cell.type = 'button';
               const val = localBoard[r][c];
               const isLeg = !flippedCoord && step.legal.some(([lr, lc]) => lr === r && lc === c);
-              cell.className = `board-cell ${isLeg ? 'is-legal' : ''}`;
+              cell.className = `board-cell ${(r + c) % 2 === 0 ? 'cell-light' : 'cell-dark'} ${isLeg ? 'is-legal' : ''}`;
               if (val) {
                 const scene = document.createElement('div');
                 scene.className = 'disc-scene';
@@ -3724,9 +4676,49 @@
           document.getElementById('modal-tutorial').classList.remove('hidden');
         });
 
-        document.getElementById('btn-nav-history').addEventListener('click', () => {
+        const openProfileAndHistoryModal = () => {
+          syncProfileUI();
           renderHistoryModal();
           document.getElementById('modal-history').classList.remove('hidden');
+        };
+
+        document.getElementById('btn-nav-profile').addEventListener('click', openProfileAndHistoryModal);
+        document.getElementById('btn-nav-history').addEventListener('click', openProfileAndHistoryModal);
+
+        const saveProfileHandler = () => {
+          const rawName = (document.getElementById('input-profile-name').value || '').trim();
+          const newName = rawName.slice(0, 20) || 'Grandmaster';
+          const newTitle = document.getElementById('select-profile-title').value || 'Grandmaster';
+          appSettings.playerName = newName;
+          appSettings.playerTitle = newTitle;
+          saveSettings();
+          syncProfileUI();
+
+          // Update active match HUD player name if currently playing
+          if (activeMode === 'ai') {
+            playerNames[aiHumanColor] = newName;
+          } else if (activeMode === 'local') {
+            playerNames.B = newName;
+          } else if (activeMode === 'online' && onlineSession.assignedColor) {
+            playerNames[onlineSession.assignedColor] = newName;
+          }
+          if (currentView === 'game') renderGameplayUI();
+
+          audio.play('confirm');
+          showNotification({
+            category: 'info',
+            title: 'Profile Saved',
+            message: `Playing as ${newName} (${newTitle})`,
+            durationMs: 2600,
+          });
+        };
+
+        document.getElementById('btn-profile-save').addEventListener('click', saveProfileHandler);
+        document.getElementById('input-profile-name').addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') {
+            ev.preventDefault();
+            saveProfileHandler();
+          }
         });
 
         document.getElementById('btn-nav-mute').addEventListener('click', () => {
@@ -3746,6 +4738,16 @@
           selectSetupTab('ai');
           switchView('setup');
         });
+
+        const heroOnlineQuick = document.getElementById('btn-hero-online-quick');
+        if (heroOnlineQuick) {
+          heroOnlineQuick.addEventListener('click', () => {
+            selectSetupTab('online');
+            switchView('setup');
+          });
+        }
+
+        
 
         document.getElementById('btn-hero-how-to-play').addEventListener('click', () => {
           currentTutorialStep = 0;
@@ -3800,8 +4802,47 @@
 
         document.getElementById('btn-start-local-match').addEventListener('click', startLocalMatch);
 
+        function openWaitingRoomPopup(room, hostNickname) {
+          const inviteUrl = (window.location.origin && window.location.origin !== 'null' && !window.location.href.startsWith('data:')) ? `${window.location.origin}${window.location.pathname}#room=${room.roomCode}` : `https://flix-reversi.app/#room=${room.roomCode}`;
+          document.getElementById('lobby-room-code').textContent = room.roomCode;
+          document.getElementById('lobby-invite-url').textContent = inviteUrl;
+          document.getElementById('waiting-modal-code').textContent = room.roomCode;
+          document.getElementById('waiting-modal-url').textContent = inviteUrl;
+          document.getElementById('waiting-host-name').textContent = `${hostNickname} (${onlineSession.assignedColor === 'W' ? 'White' : 'Black'})`;
+          document.getElementById('online-waiting-lobby').classList.remove('hidden');
+          document.getElementById('modal-waiting-room').classList.remove('hidden');
+          syncOnlineCreateLockUI();
+        }
+
+        function cancelActiveOnlineRoom() {
+          if (onlineSession.unsubscribe) onlineSession.unsubscribe();
+          onlineSession.roomCode = null;
+          onlineSession.playerToken = null;
+          onlineSession.assignedColor = null;
+          onlineSession.dualClientActive = false;
+          document.getElementById('online-waiting-lobby').classList.add('hidden');
+          document.getElementById('modal-waiting-room').classList.add('hidden');
+          document.getElementById('board-waiting-banner').classList.add('hidden');
+          syncOnlineCreateLockUI();
+        }
+
         document.getElementById('btn-online-create-room').addEventListener('click', () => {
-          const nickname = document.getElementById('input-online-nickname').value || 'HostPlayer';
+          const nickname = (document.getElementById('input-online-nickname').value || appSettings.playerName || 'HostPlayer').trim();
+          // Guard: Do not create a duplicate room if an unused/waiting room is already active!
+          if (onlineSession.roomCode) {
+            const existingRoom = sharedLedger.loadRoom(onlineSession.roomCode);
+            if (existingRoom && (!existingRoom.players.B || !existingRoom.players.W)) {
+              openWaitingRoomPopup(existingRoom, nickname);
+              showNotification({
+                category: 'info',
+                title: 'Room Already Active',
+                message: `Room ${existingRoom.roomCode} is already open and waiting for your opponent.`,
+                durationMs: 2600,
+              });
+              return;
+            }
+          }
+
           const preferredColor = document.getElementById('select-online-color').value || 'B';
           const timerVal = Number(document.getElementById('select-online-timer').value || 0);
           document.getElementById('online-error-recovery').classList.add('hidden');
@@ -3819,12 +4860,8 @@
             onlineSession.dualClientActive = false;
             onlineSession.connectionStatus = 'Connected';
 
-            const inviteUrl = `${window.location.origin}${window.location.pathname}#room=${res.room.roomCode}`;
-            document.getElementById('lobby-room-code').textContent = res.room.roomCode;
-            document.getElementById('lobby-invite-url').textContent = inviteUrl;
-            document.getElementById('online-waiting-lobby').classList.remove('hidden');
-
             bindOnlineRoomSubscription(res.room.roomCode);
+            openWaitingRoomPopup(res.room, nickname);
             audio.play('room_create');
           }
         });
@@ -3876,7 +4913,15 @@
           copyTextSafe(url, 'Invite Link');
         });
 
-        document.getElementById('btn-lobby-connect-second-client').addEventListener('click', () => {
+        const enterWaitingRoomOnBoard = () => {
+          if (!onlineSession.roomCode) return;
+          const room = sharedLedger.loadRoom(onlineSession.roomCode);
+          if (!room) return;
+          document.getElementById('modal-waiting-room').classList.add('hidden');
+          startOnlineMatchFromRoom(room);
+        };
+
+        const connectSecondSeatNow = () => {
           if (!onlineSession.roomCode) return;
           const res = sharedLedger.joinRoom({
             roomCode: onlineSession.roomCode,
@@ -3886,16 +4931,33 @@
             onlineSession.dualClientActive = true;
             onlineSession.guestToken = res.playerToken;
             onlineSession.guestColor = res.assignedColor;
+            onlineSession.connectionStatus = 'Connected';
             document.getElementById('online-waiting-lobby').classList.add('hidden');
+            document.getElementById('modal-waiting-room').classList.add('hidden');
             startOnlineMatchFromRoom(res.room);
           }
+        };
+
+        document.getElementById('btn-lobby-wait-in-room').addEventListener('click', enterWaitingRoomOnBoard);
+        document.getElementById('btn-waiting-enter-room').addEventListener('click', enterWaitingRoomOnBoard);
+
+        document.getElementById('btn-lobby-connect-second-client').addEventListener('click', connectSecondSeatNow);
+        document.getElementById('btn-waiting-connect-seat2').addEventListener('click', connectSecondSeatNow);
+        document.getElementById('btn-board-wait-seat2').addEventListener('click', connectSecondSeatNow);
+
+        document.getElementById('btn-waiting-copy-code').addEventListener('click', () => {
+          if (onlineSession.roomCode) copyTextSafe(onlineSession.roomCode, 'Room Code');
+        });
+        document.getElementById('btn-board-wait-copy').addEventListener('click', () => {
+          if (onlineSession.roomCode) copyTextSafe(onlineSession.roomCode, 'Room Code');
+        });
+        document.getElementById('btn-waiting-copy-link').addEventListener('click', () => {
+          const url = document.getElementById('waiting-modal-url').textContent || '';
+          copyTextSafe(url, 'Invite Link');
         });
 
-        document.getElementById('btn-lobby-leave').addEventListener('click', () => {
-          if (onlineSession.unsubscribe) onlineSession.unsubscribe();
-          onlineSession.roomCode = null;
-          document.getElementById('online-waiting-lobby').classList.add('hidden');
-        });
+        document.getElementById('btn-lobby-leave').addEventListener('click', cancelActiveOnlineRoom);
+        document.getElementById('btn-waiting-cancel-room').addEventListener('click', cancelActiveOnlineRoom);
 
         document.getElementById('btn-recovery-create-new').addEventListener('click', () => {
           document.getElementById('online-error-recovery').classList.add('hidden');
@@ -3963,6 +5025,121 @@
           }
         });
 
+        // Tactical Coach Hint Button
+        document.getElementById('btn-game-hint').addEventListener('click', () => {
+          if (!canHumanClickBoard() || gameState.legalMoves.length === 0) return;
+          audio.unlock();
+          audio.play('confirm');
+          const decision = selectAIMove(gameState.board, gameState.currentTurn, { difficulty: 'hard' });
+          if (decision) {
+            activeHintCoord = { row: decision.row, col: decision.col };
+            const notation = toAlgebraicNotation(decision.row, decision.col);
+            const isCorner = (decision.row === 0 || decision.row === 7) && (decision.col === 0 || decision.col === 7);
+            const reason = isCorner
+              ? 'Seizes permanent corner control'
+              : decision.capturedCount >= 3
+              ? `Outflanks ${decision.capturedCount} discs with strong mobility`
+              : 'Maximizes positional mobility & stability';
+            document.getElementById('hud-hint-text').textContent = `Coach: Play ${notation} — ${reason}`;
+            document.getElementById('hud-hint-banner').classList.remove('hidden');
+            renderGameplayUI();
+          }
+        });
+
+        document.getElementById('btn-hint-dismiss').addEventListener('click', () => {
+          activeHintCoord = null;
+          document.getElementById('hud-hint-banner').classList.add('hidden');
+          renderGameplayUI();
+        });
+
+        // Undo Turn Button (Local & vs AI modes)
+        document.getElementById('btn-game-undo').addEventListener('click', () => {
+          if (activeMode === 'online' || stateUndoStack.length === 0 || isAiThinking) return;
+          audio.play('ui_click');
+          gameState = stateUndoStack.pop();
+          activeHintCoord = null;
+          reviewStepIndex = null;
+          document.getElementById('hud-hint-banner').classList.add('hidden');
+          document.getElementById('modal-results').classList.add('hidden');
+          renderGameplayUI();
+        });
+
+        // Board Theme Switcher Buttons (Synced across Settings, Home Preview & Game Arena)
+        document.querySelectorAll('[data-theme]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const theme = btn.getAttribute('data-theme') || 'emerald';
+            applyBoardTheme(theme);
+            saveSettings();
+            audio.play('ui_click');
+          });
+        });
+
+        // Stickers & Quick Messages Buttons (with Live Timestamps)
+        function handleSendReaction(text) {
+          audio.unlock();
+          let senderColor = gameState.currentTurn;
+          if (activeMode === 'ai') senderColor = aiHumanColor;
+          else if (activeMode === 'online' && onlineSession.assignedColor && !onlineSession.dualClientActive) {
+            senderColor = onlineSession.assignedColor;
+          }
+          const senderName = playerNames[senderColor] || getPlayerName(senderColor);
+          const nowTs = Date.now();
+
+          if (activeMode === 'online' && onlineSession.roomCode) {
+            sharedLedger.sendReaction({
+              roomCode: onlineSession.roomCode,
+              senderColor,
+              senderName,
+              text,
+            });
+          } else {
+            triggerReactionBubble(senderColor, senderName, text, null, nowTs);
+            if (activeMode === 'ai') {
+              const aiColor = getOpponentColor(aiHumanColor);
+              const aiReplies = [
+                '🌹 A rose for that play!',
+                '❤️ Much respect, Grandmaster!',
+                '🔪 Careful—the corners are mine!',
+                '😭 You outflanked my best line!',
+              ];
+              const reply = aiReplies[Math.floor(Math.random() * aiReplies.length)];
+              setTimeout(() => {
+                triggerReactionBubble(aiColor, playerNames[aiColor], reply, null, Date.now());
+              }, 680);
+            }
+          }
+        }
+
+        document.querySelectorAll('[data-sticker]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            handleSendReaction(btn.getAttribute('data-sticker'));
+          });
+        });
+
+        document.querySelectorAll('[data-qmsg]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            handleSendReaction(btn.getAttribute('data-qmsg'));
+          });
+        });
+
+        const sendCustomChatMessage = () => {
+          const inp = document.getElementById('input-chat-custom');
+          if (!inp) return;
+          const raw = (inp.value || '').trim();
+          if (!raw) return;
+          const formatted = /^[🔪❤️😭🌹👑🔥🧠⚡💬]/.test(raw) ? raw : `💬 ${raw}`;
+          inp.value = '';
+          handleSendReaction(formatted);
+        };
+
+        document.getElementById('btn-chat-send').addEventListener('click', sendCustomChatMessage);
+        document.getElementById('input-chat-custom').addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter') {
+            ev.preventDefault();
+            sendCustomChatMessage();
+          }
+        });
+
         document.getElementById('btn-game-restart').addEventListener('click', () => {
           if (gameState.status === 'playing' && gameState.moveHistory.length > 0) {
             askConfirmation('Restart Active Match?', 'Current board progress will be reset. Start a fresh match?', () => {
@@ -3976,9 +5153,11 @@
         document.getElementById('btn-game-leave').addEventListener('click', () => {
           if (gameState.status === 'playing' && gameState.moveHistory.length > 0) {
             askConfirmation('Abandon Active Match?', 'Leaving now will end your current session. Return to Home?', () => {
+              if (activeMode === 'online') cancelActiveOnlineRoom();
               switchView('home');
             });
           } else {
+            if (activeMode === 'online') cancelActiveOnlineRoom();
             switchView('home');
           }
         });
@@ -4132,6 +5311,7 @@
           appSettings.showCapturePreview = true;
           appSettings.defaultColor = 'B';
           appSettings.defaultTimer = 0;
+          appSettings.boardTheme = 'emerald';
           saveSettings();
           syncSettingsModalUI();
           syncAudioUI();
@@ -4218,6 +5398,7 @@
         document.getElementById('chk-settings-capture-preview').checked = appSettings.showCapturePreview;
         document.getElementById('select-settings-default-color').value = appSettings.defaultColor;
         document.getElementById('select-settings-default-timer').value = String(appSettings.defaultTimer);
+        applyBoardTheme(appSettings.boardTheme || 'emerald');
       }
 
       function renderHistoryModal() {
